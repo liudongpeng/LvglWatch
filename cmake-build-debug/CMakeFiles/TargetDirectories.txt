@@ -1,0 +1,3 @@
+C:/Users/summer/Desktop/LvglWatch/cmake-build-debug/CMakeFiles/LvglWatch.elf.dir
+C:/Users/summer/Desktop/LvglWatch/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/summer/Desktop/LvglWatch/cmake-build-debug/CMakeFiles/rebuild_cache.dir
