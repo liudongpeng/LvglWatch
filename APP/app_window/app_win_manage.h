@@ -12,7 +12,7 @@ extern "C" {
 
 #include "page_about.h"
 #include "page_dial_plate.h"
-
+#include "page_main_menu.h"
 
 
 int app_display_init();

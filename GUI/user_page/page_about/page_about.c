@@ -10,12 +10,12 @@
 
 extern page_manager_t g_page_manager;    /* 界面管理器, 在freertos.c文件中定义 */
 
-page_t page_about;    /* "关于"界面 */
+page_t page_about;    /* "关于"界面, 以此来进行界面管理 */
 
-static lv_obj_t *app_win;   /* "关于"界面窗口, 界面中的元素在其上面绘制 */
+static lv_obj_t *app_win;   /* "关于"界面窗口, 用于绘制其他控件 */
 
 static lv_obj_t *label_title;   /* 标题标签 */
-static lv_obj_t *line_title;    /* 标题线条 */
+static lv_obj_t *line_title;    /* 标题分割线 */
 
 static lv_obj_t *img_logo;  /* 图片logo */
 
@@ -23,15 +23,17 @@ static lv_obj_t *label_author;  /* 作者 */
 static lv_obj_t *label_fw_info; /* 固件信息 */
 
 
-
 static void title_create(const char *text);
+
 static void img_create();
+
 static void label_info_create();
 
 static void page_about_setup();
-static void page_about_exit();
-static void page_about_event_handle(void *obj, int event);
 
+static void page_about_exit();
+
+static void page_about_event_handle(void *obj, int event);
 
 
 /**
@@ -40,20 +42,33 @@ static void page_about_event_handle(void *obj, int event);
  */
 static void title_create(const char *text)
 {
+	/* 创建标签 */
 	label_title = lv_label_create(app_win);
 	lv_label_set_text_static(label_title, text);
 	lv_obj_align(label_title, LV_ALIGN_TOP_MID, 0, 0);
 
+	/* 设置标签样式 */
 	static lv_style_t style_label;
+	lv_style_init(&style_label);
+	lv_style_set_text_color(&style_label, lv_color_white());
+	lv_style_set_text_font(&style_label, &lv_font_montserrat_30);
+	lv_obj_add_style(label_title, &style_label, 0);
 
 
+	/* 创建标签下的分隔线 */
+	static lv_point_t line_points[2];
+	line_points[1].x = APP_WIN_WIDTH(app_win) - 1;
 	line_title = lv_line_create(app_win);
-	lv_point_t line_points[2] = {{0,                      0},
-	                             {APP_WIN_WIDTH(app_win), 0}};
 	lv_line_set_points(line_title, line_points, 2);
-	lv_obj_align_to(line_title, label_title, LV_ALIGN_OUT_BOTTOM_MID, 0, 2);
+	lv_obj_align_to(line_title, label_title, LV_ALIGN_OUT_BOTTOM_MID, 0, 20);
 
+	/* 设置分割线样式 */
 	static lv_style_t style_line;
+	lv_style_init(&style_line);
+	lv_style_set_line_color(&style_line, lv_color_make(0xff, 0, 0));
+	lv_style_set_line_width(&style_line, 2);
+	lv_style_set_line_rounded(&style_line, true);
+	lv_obj_add_style(line_title, &style_line, 0);
 }
 
 /**
@@ -65,7 +80,7 @@ static void img_create()
 
 	img_logo = lv_img_create(app_win);
 	lv_img_set_src(img_logo, &img_watchx_logo);
-//	lv_obj_align_to(img_logo, line_title, LV_ALIGN_OUT_BOTTOM_MID, 0, 20);
+	lv_obj_align_to(img_logo, line_title, LV_ALIGN_OUT_BOTTOM_MID, 0, 20);
 	lv_obj_center(img_logo);
 }
 
@@ -74,18 +89,22 @@ static void img_create()
  */
 static void label_info_create()
 {
+	static lv_style_t style;
+	lv_style_init(&style);
+	lv_style_set_text_color(&style, lv_color_white());
+	lv_style_set_text_font(&style, lv_font_default());
+
 	/* 作者标签控件 */
 	label_author = lv_label_create(app_win);
 	lv_label_set_text_static(label_author, "- DEVELOPER -");
 	lv_obj_align(label_author, LV_ALIGN_BOTTOM_MID, 0, -30);
+	lv_obj_add_style(label_author, &style, 0);
 
 	/* 固件信息标签控件 */
 	label_fw_info = lv_label_create(app_win);
 	lv_label_set_text_static(label_fw_info, WATCH_NAME" "WATCH_SW_VER"\n"__DATE__);
 	lv_obj_align(label_fw_info, LV_ALIGN_BOTTOM_MID, 0, 0);
-
-	printf("child cnt = %lu\n", lv_obj_get_child_cnt(app_win));
-	printf("app_win = %p\n", app_win);
+	lv_obj_add_style(label_fw_info, &style, 0);
 }
 
 /**
@@ -136,6 +155,14 @@ int about_window_create()
 
 	lv_obj_set_size(app_win, 135, 240);
 	lv_obj_center(app_win);
+	lv_obj_set_scrollbar_mode(app_win, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
+
+	static lv_style_t style;
+	lv_style_init(&style);
+	lv_style_set_radius(&style, 0); /* 设置样式圆角为 直角 */
+	lv_style_set_border_side(&style, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
+	lv_style_set_bg_color(&style, lv_color_black());    /* 设置背景色为 黑色 */
+	lv_obj_add_style(app_win, &style, 0);
 
 	return 0;
 }

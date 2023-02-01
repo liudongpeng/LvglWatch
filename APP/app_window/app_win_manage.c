@@ -53,7 +53,7 @@ static void app_pages_register()
  */
 int app_display_init()
 {
-	/* 创建所有界面的窗口对象 */
+	/* 创建所有界面的窗口 */
 	app_windows_create();
 
 	/* 将所有界面注册到界面管理器 */

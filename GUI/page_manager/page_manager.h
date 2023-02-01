@@ -82,6 +82,7 @@ void page_clear(page_manager_t *pm, page_t *page);
 void page_stack_clear(page_manager_t *pm);
 
 int page_push(page_manager_t *pm, page_t *page);
+int page_push_by_id(page_manager_t *pm, uint8_t id);
 
 int page_pop(page_manager_t *pm);
 
@@ -90,6 +91,9 @@ int page_change(page_manager_t *pm, page_t *page);
 int page_event_transmit(page_manager_t *pm, void* obj, int event);
 
 void page_run(page_manager_t *pm);
+
+
+page_t* get_page_by_id(page_manager_t* pm, uint8_t id);
 
 
 #ifdef __cplusplus

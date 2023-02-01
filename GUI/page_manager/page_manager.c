@@ -44,6 +44,27 @@ int page_create(page_t *page, callback_func_t page_setup, callback_func_t page_l
 }
 
 /**
+ * @brief 通过id号拿到page句柄
+ * @param[in]	pm
+ * @param[in]	id
+ * @return
+ */
+page_t* get_page_by_id(page_manager_t* pm, uint8_t id)
+{
+	page_t* page;
+
+	if (pm == NULL)
+		return NULL;
+
+	if (!CHECK_PAGE_ID(id))
+		return NULL;
+
+	page = &pm->page_list[id];
+
+	return page;
+}
+
+/**
  * @brief 创建界面管理器
  * @param[out]	pm
  * @param[in]	max_page_num
@@ -135,6 +156,39 @@ void page_stack_clear(page_manager_t *pm)
 	}
 
 	pm->page_stack_top = 0;
+}
+
+/**
+ * @brief 此界面压栈
+ * @param[in]	pm
+ * @param[in]	id
+ * @return
+ */
+int page_push_by_id(page_manager_t *pm, uint8_t id)
+{
+	if (pm == NULL)
+		return -1;
+
+	if (!CHECK_PAGE_ID(id))
+		return -2;
+
+	/* 界面是否繁忙 */
+	if (pm->is_busy)
+		return -3;
+
+	/* 防止栈溢出 */
+	if (pm->page_stack_top >= pm->page_stack_size)
+		return -4;
+
+	/* 防止重复压栈 */
+	if (pm->page_stack[pm->page_stack_top] == id)
+		return -5;
+
+	/* 压栈 */
+	pm->page_stack[(pm->page_stack_top)++] = id;
+
+	/* 跳转到此界面 */
+	return page_change(pm, NULL);
 }
 
 /**
