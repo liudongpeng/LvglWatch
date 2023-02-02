@@ -35,6 +35,8 @@ int page_create(page_t *page, callback_func_t page_setup, callback_func_t page_l
 	/* 界面编号自增1 */
 	page->page_id = s_page_id++;
 
+	page->page_addr = page;
+
 	page->page_setup = page_setup;
 	page->page_loop = page_loop;
 	page->page_exit = page_exit;
@@ -51,17 +53,13 @@ int page_create(page_t *page, callback_func_t page_setup, callback_func_t page_l
  */
 page_t* get_page_by_id(page_manager_t* pm, uint8_t id)
 {
-	page_t* page;
-
 	if (pm == NULL)
 		return NULL;
 
-	if (!CHECK_PAGE_ID(id))
-		return NULL;
+//	if (!CHECK_PAGE_ID(id))
+//		return NULL;
 
-	page = &pm->page_list[id];
-
-	return page;
+	return pm->page_list[id].page_addr;
 }
 
 /**
@@ -109,10 +107,16 @@ int page_register(page_manager_t *pm, page_t *page)
 	if (!CHECK_PAGE_ID(id))
 		return -2;
 
+	printf("in page_register(), id = %d\n", id);
+
+	pm->page_list[id] = *page;
+
 	pm->page_list[id].page_setup = page->page_setup;
 	pm->page_list[id].page_loop = page->page_loop;
 	pm->page_list[id].page_exit = page->page_exit;
 	pm->page_list[id].page_event_handle = page->page_event_handle;
+
+	printf("pm->page_list[3].page_exit = %p\n", pm->page_list[id].page_exit);
 
 	return 0;
 }
@@ -220,8 +224,11 @@ int page_push(page_manager_t *pm, page_t *page)
 	if (pm->page_stack[pm->page_stack_top] == id)
 		return -5;
 
+
 	/* 压栈 */
-	pm->page_stack[(pm->page_stack_top)++] = id;
+	pm->page_stack[++pm->page_stack_top] = id;
+
+	printf("stack top = %d\n", pm->page_stack_top);
 
 	/* 跳转到此界面 */
 	return page_change(pm, page);
@@ -239,7 +246,7 @@ int page_pop(page_manager_t *pm)
 	if (pm == NULL)
 		return -1;
 
-	id = pm->page_stack[pm->page_stack_top - 1];
+	id = pm->page_stack[pm->page_stack_top];
 	if (!CHECK_PAGE_ID(id))
 		return -2;
 
@@ -247,22 +254,22 @@ int page_pop(page_manager_t *pm)
 	if (pm->is_busy)
 		return -3;
 
-	/* 防止栈溢出 */
+	/* 栈空, 不做操作 */
 	if (pm->page_stack_top <= -1)
 		return -4;
 
 	/* 清空此界面 */
 	page_clear(pm, &pm->page_list[id]);
 
-	/* 弹栈 */
-	(pm->page_stack_top)--;
-
-	/* 栈空, 不做操作 */
-	if (pm->page_stack_top == 0)
-		return -5;
-
 	/* 切换到当前栈顶的界面 */
-	return page_change(pm, &pm->page_list[pm->page_stack[pm->page_stack_top - 1]]);
+	if (pm->page_stack_top > 0)
+	{
+		pm->page_stack_top--;
+		printf("stack top = %d\n", pm->page_stack_top);
+		return page_change(pm, &pm->page_list[pm->page_stack[pm->page_stack_top]]);
+	}
+
+	return 0;
 }
 
 /**
@@ -327,8 +334,12 @@ void page_run(page_manager_t *pm)
 	/* 界面切换事件 */
 	if (pm->new_page != pm->old_page)
 	{
+		printf("page change, old = %d, new = %d\n", pm->old_page, pm->new_page);
+
 		/* 标记为繁忙 */
 		pm->is_busy = 1;
+
+		printf("pm->page_list[pm->old_page].page_exit = %p\n", pm->page_list[pm->old_page].page_exit);
 
 		/* 触发旧界面退出事件 */
 		if (CHECK_PAGE_ID(pm->old_page) && pm->page_list[pm->old_page].page_exit != NULL)

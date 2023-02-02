@@ -4,7 +4,7 @@
 
 #include "page_about.h"
 #include "bsp.h"
-#include "util.h"
+#include "lvgl_obj_util.h"
 #include <stdio.h>
 
 
@@ -51,16 +51,15 @@ static void title_create(const char *text)
 	static lv_style_t style_label;
 	lv_style_init(&style_label);
 	lv_style_set_text_color(&style_label, lv_color_white());
-	lv_style_set_text_font(&style_label, &lv_font_montserrat_30);
+	lv_style_set_text_font(&style_label, &lv_font_montserrat_20);
 	lv_obj_add_style(label_title, &style_label, 0);
-
 
 	/* 创建标签下的分隔线 */
 	static lv_point_t line_points[2];
 	line_points[1].x = APP_WIN_WIDTH(app_win) - 1;
 	line_title = lv_line_create(app_win);
 	lv_line_set_points(line_title, line_points, 2);
-	lv_obj_align_to(line_title, label_title, LV_ALIGN_OUT_BOTTOM_MID, 0, 20);
+	lv_obj_align_to(line_title, label_title, LV_ALIGN_OUT_BOTTOM_MID, 0, 2);
 
 	/* 设置分割线样式 */
 	static lv_style_t style_line;
@@ -89,15 +88,14 @@ static void img_create()
  */
 static void label_info_create()
 {
-	static lv_style_t style;
-	lv_style_init(&style);
-	lv_style_set_text_color(&style, lv_color_white());
-	lv_style_set_text_font(&style, lv_font_default());
-
 	/* 作者标签控件 */
 	label_author = lv_label_create(app_win);
 	lv_label_set_text_static(label_author, "- DEVELOPER -");
 	lv_obj_align(label_author, LV_ALIGN_BOTTOM_MID, 0, -30);
+	static lv_style_t style;
+	lv_style_init(&style);
+	lv_style_set_text_color(&style, lv_color_white());
+	lv_style_set_text_font(&style, lv_font_default());
 	lv_obj_add_style(label_author, &style, 0);
 
 	/* 固件信息标签控件 */
@@ -125,6 +123,7 @@ static void page_about_setup()
 static void page_about_exit()
 {
 	lv_obj_clean(app_win);
+	printf("page_about_exit()\n");
 }
 
 /**
@@ -140,6 +139,8 @@ static void page_about_event_handle(void *obj, int event)
 		{
 			/* 现在显示的是"关于"界面, 在此界面时, 只需要做退出此界面的操作 */
 			page_pop(&g_page_manager);
+
+			printf("page_about pop\n");
 		}
 	}
 }
@@ -174,8 +175,12 @@ int about_window_create()
 int page_about_register()
 {
 	/* 创建新界面, 并注册到界面管理器 */
-	page_create(&page_about, page_about_setup, NULL, page_about_exit, page_about_event_handle);
-	page_register(&g_page_manager, &page_about);
+	if (page_create(&page_about, page_about_setup, NULL, page_about_exit, page_about_event_handle) < 0)
+		printf("page_about create failed\n");
+	if (page_register(&g_page_manager, &page_about) < 0)
+		printf("page_about register failed\n");
+
+	printf("page_about_register() id = %d\n", page_about.page_id);
 
 	return 0;
 }

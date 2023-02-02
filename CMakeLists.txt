@@ -64,20 +64,20 @@ include_directories(
         BSP/bsp_config
         BSP/bsp_button
         BSP/bsp_led
-        BSP/display
+        BSP/bsp_display
 
         GUI/page_manager
 
+        GUI/
         GUI/user_page
-        GUI/user_page/util
+        GUI/user_page/image_src
+        GUI/user_page/lvgl_obj_util
         GUI/user_page/page_about
         GUI/user_page/page_dial_plate
         GUI/user_page/page_main_menu
         GUI/user_page/page_stop_watch
 
-        Image
-
-        APP/app_window
+        Util/debug_print
 )
 
 
@@ -96,20 +96,20 @@ file(GLOB_RECURSE SOURCES "Core/*.*" "Middlewares/*.*" "Drivers/*.*"
         "BSP/bsp_config/*.*"
         "BSP/bsp_button/*.*"
         "BSP/bsp_led/*.*"
-        "BSP/display/*.*"
+        "BSP/bsp_display/*.*"
 
         "GUI/page_manager/*.*"
 
+        "GUI/*.*"
         "GUI/user_page/*.*"
-        "GUI/user_page/util/*.*"
+        "GUI/user_page/image_src/*.*"
+        "GUI/user_page/lvgl_obj_util/*.*"
         "GUI/user_page/page_about/*.*"
         "GUI/user_page/page_dial_plate/*.*"
         "GUI/user_page/page_main_menu/*.*"
         "GUI/user_page/page_stop_watch/*.*"
 
-        "Image/*.*"
-
-        "APP/app_window/*.*"
+        "Util/debug_print/*.*"
         )
 
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F407ZGTX_FLASH.ld)

@@ -29,7 +29,7 @@
 #include "bsp.h"
 #include "lvgl.h"
 #include "lv_port_disp.h"
-#include "app_win_manage.h"
+#include "app_display.h"
 #include "page_manager.h"
 
 
@@ -108,7 +108,8 @@ void MX_FREERTOS_Init(void)
 
 	printf("begin MX_FREERTOS_Init()\n");
 
-	/* 显示器初始化 */
+	bsp_button_init();
+	bsp_led_init();
 	bsp_display_init();
 
 	/* lvgl及显示驱动初始化 */
@@ -181,7 +182,7 @@ void StartDefaultTask(void *argument)
 
 /* USER CODE BEGIN Header_start_display_flush_task */
 /**
-* @brief Function implementing the display_flush_task thread.
+* @brief 显示器刷新任务
 * @param argument: Not used
 * @retval None
 */
@@ -192,7 +193,7 @@ void start_display_flush_task(void *argument)
 	/* Infinite loop */
 	for (;;)
 	{
-		lv_timer_handler();
+		lv_task_handler();
 		page_run(&g_page_manager);
 
 		osDelay(1);
@@ -204,8 +205,8 @@ void start_display_flush_task(void *argument)
 /* USER CODE BEGIN Application */
 
 /**
- * @brief
- * @param htim
+ * @brief 定时器中断回调
+ * @param[in]	htim
  */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {

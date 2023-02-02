@@ -13,10 +13,10 @@ extern "C" {
 
 #include "page_manager.h"
 
+extern page_t page_dial;   /* "±íÅÌ"½çÃæ */
 
 
-
-
+int dial_window_create();
 int page_dial_register();
 
 

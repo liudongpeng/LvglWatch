@@ -5,7 +5,7 @@
 #include "bsp_led.h"
 
 
-led_t user_led;	/* 用户led */
+led_t g_user_led;	/* 用户led */
 
 
 /**
@@ -15,9 +15,9 @@ led_t user_led;	/* 用户led */
 int bsp_led_init()
 {
 	/* 实例化led对象 */
-	led_create(&user_led, 0, user_led_set_level);
+	led_create(&g_user_led, 0, user_led_set_level);
 
-	led_close(&user_led);
+	led_close(&g_user_led);
 
 	return 0;
 }

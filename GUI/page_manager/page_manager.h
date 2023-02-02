@@ -21,6 +21,8 @@ typedef struct page
 {
 	uint8_t page_id;    /* 界面id */
 
+	struct page* page_addr; /* 界面对象地址 */
+
 	/**
 	 * @brief 设置界面
 	 */

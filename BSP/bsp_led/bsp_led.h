@@ -14,7 +14,7 @@ extern "C" {
 #include "led.h"
 
 
-extern led_t user_led;	/* 用户led */
+extern led_t g_user_led;	/* 用户led */
 
 
 int bsp_led_init();

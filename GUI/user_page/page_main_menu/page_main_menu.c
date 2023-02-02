@@ -4,7 +4,7 @@
 
 #include "page_main_menu.h"
 #include "bsp.h"
-#include "util.h"
+#include "lvgl_obj_util.h"
 #include "user_page_private.h"
 #include <stdio.h>
 
@@ -28,7 +28,7 @@ static lv_obj_t *app_win;   /* "主菜单"界面窗口, 用于绘制其他控件 */
 static lv_obj_t *label_title;   /* 标题标签 */
 static lv_obj_t *line_title;    /* 标题分割线 */
 
-static lv_obj_t *img_icon;  /* img控件, 用于显示图标 */
+static lv_obj_t *icon_disp;  /* img控件, 用于显示图标 */
 static lv_obj_t *icon_cont; /* 图标容器 */
 
 
@@ -39,13 +39,17 @@ typedef struct icon
 {
 	const void *icon_data;  /* 图标数据 */
 	const char *icon_name;  /* 图标描述 */
-	lv_obj_t *img_icon; /* img控件, 用来显示图标 */
-	uint8_t page_id;    /* 界面id */
+	lv_obj_t *img_icon;     /* img控件, 用来显示图标 */
+	uint8_t page_id;        /* 界面id */
 } icon_t;
 
 /* 图标集合, 保存所有图标对象 */
 static icon_t icon_grp[] = {
-	{.icon_data = &icon_info, .icon_name = "About", .page_id = 1},  /* 关于 */
+	{.icon_data = &icon_stop_watch, .icon_name = "StopWatch",   .page_id = Page_StopWatch}, /* 停表 */
+	{.icon_data = &icon_mountain,   .icon_name = "Altitude",    .page_id = Page_Altitude},  /* 海拔高度 */
+	{.icon_data = &icon_light,      .icon_name = "BackLight",   .page_id = Page_BackLight}, /* 亮度 */
+	{.icon_data = &icon_time_cfg,   .icon_name = "TimeCfg",     .page_id = Page_TimeCfg},   /* 时间设置 */
+	{.icon_data = &icon_info,       .icon_name = "About",       .page_id = Page_About},     /* 关于 */
 };
 
 
@@ -65,13 +69,22 @@ static uint8_t icon_idx_cur;    /* 当前图标索引 */
 static void icon_grp_create()
 {
 	/* 创建图标显示窗口 */
-	img_icon = lv_obj_create(app_win);
-	lv_obj_set_size(img_icon, ICON_SIZE + 20, APP_WIN_HEIGHT(app_win) - lv_obj_get_y(line_title) - 20);
+	icon_disp = lv_obj_create(app_win);
+	lv_obj_set_size(icon_disp, ICON_SIZE + 20, APP_WIN_HEIGHT(app_win) - lv_obj_get_y(line_title) - 20);
+	lv_obj_align(icon_disp, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
+	lv_obj_set_scrollbar_mode(icon_disp, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
+
+	/* 设置图标显示窗口对象透明 */
+	static lv_style_t style_icon_disp;
+	lv_style_init(&style_icon_disp);
+	lv_style_set_opa(&style_icon_disp, LV_OPA_TRANSP);
+	lv_obj_add_style(icon_disp, &style_icon_disp, 0);
 
 	/* 把图片竖向拼接起来, 图片可以在屏幕上下滑动 */
-	icon_cont = lv_obj_create(img_icon);
-	lv_obj_set_size(icon_cont, lv_obj_get_width(img_icon), (ICON_SIZE + ICON_INTERVAL) * ICON_COUNT);
+	icon_cont = lv_obj_create(icon_disp);
+	lv_obj_set_size(icon_cont, lv_obj_get_width(icon_disp), (ICON_SIZE + ICON_INTERVAL) * ICON_COUNT);
 	lv_obj_set_y(icon_cont, lv_obj_get_height(icon_cont));
+	lv_obj_add_style(icon_cont, &style_icon_disp, 0);
 
 	for (int i = 0; i < ICON_COUNT; i++)
 	{
@@ -97,18 +110,24 @@ static void title_create()
 	lv_obj_align(label_title, LV_ALIGN_TOP_MID, 0, 0);
 
 	static lv_style_t style_label;
+	lv_style_init(&style_label);
+	lv_style_set_text_color(&style_label, lv_color_white());
+	lv_style_set_text_font(&style_label, &lv_font_montserrat_20);
+	lv_obj_add_style(label_title, &style_label, 0);
 
 
+	static lv_point_t line_points[2];
+	line_points[1].x = APP_WIN_WIDTH(app_win) - 1;
 	line_title = lv_line_create(app_win);
-	lv_point_t line_points[2] = {{0,                      0},
-	                             {APP_WIN_WIDTH(app_win), 0}};
 	lv_line_set_points(line_title, line_points, 2);
 	lv_obj_align_to(line_title, label_title, LV_ALIGN_OUT_BOTTOM_MID, 0, 2);
 
 	static lv_style_t style_line;
 	lv_style_init(&style_line);
+	lv_style_set_line_color(&style_line, lv_color_make(0xff, 0, 0));
 	lv_style_set_line_width(&style_line, 2);
 	lv_style_set_line_rounded(&style_line, true);
+	lv_obj_add_style(line_title, &style_line, 0);
 }
 
 /**
@@ -127,7 +146,7 @@ static void icon_grp_move_focus(uint8_t idx)
 	int tar_y = -(ICON_SIZE + ICON_INTERVAL) * (idx - 1);
 
 	/* 滑动图标长图到目标位置 */
-
+	LB_OBJ_START_ANIM(icon_cont, y, tar_y, LV_OBJ_ANIM_EXEC_TIME);
 }
 
 /**
@@ -137,8 +156,14 @@ static void icon_grp_move_focus(uint8_t idx)
  */
 static void icon_grp_move(int8_t dir)
 {
-	/* 在限定范围内移动 */
-
+	/* 更新图标索引 */
+	int tmp = icon_idx_cur;
+	tmp += dir;
+	if (tmp < 0)
+		tmp = ICON_INDEX_MAX;
+	if (tmp > ICON_INDEX_MAX)
+		tmp = 0;
+	icon_idx_cur = tmp;
 
 	/* 移动到当前选中的图标 */
 	icon_grp_move_focus(icon_idx_cur);
@@ -168,9 +193,9 @@ static void page_main_menu_setup()
 {
 	title_create();
 	icon_grp_create();
-	img_shadow_create();
+//	img_shadow_create();
 
-	icon_grp_move_focus(icon_idx_cur);
+//	icon_grp_move_focus(icon_idx_cur);
 }
 
 /**
@@ -178,6 +203,8 @@ static void page_main_menu_setup()
  */
 static void page_main_menu_exit()
 {
+	/* 图标全部滑出 */
+	LB_OBJ_START_ANIM(icon_cont, y, lv_obj_get_height(icon_disp) + ICON_SIZE, LV_OBJ_ANIM_EXEC_TIME);
 
 
 	lv_obj_clean(app_win);
@@ -188,7 +215,7 @@ static void page_main_menu_exit()
  * @param[in]	btn
  * @param[in]	event
  */
-static void page_main_menu_event(void *btn, int event)
+static void page_main_menu_event_handle(void *btn, int event)
 {
 	uint8_t id;
 
@@ -211,7 +238,53 @@ static void page_main_menu_event(void *btn, int event)
 				break;
 		}
 	}
+	else
+	{
+		/* 单击或长按 上下(左右)按键, 图标上下滑动并选中 */
+		if (event == ButtonEvent_SingleClick || event == ButtonEvent_LongPressHold)
+		{
+			if (btn == &g_btn_left)
+				icon_grp_move(-1);
+			if (btn == &g_btn_right)
+				icon_grp_move(1);
+		}
+	}
 }
 
+/**
+ * @brief 创建"主菜单"界面窗口(容器)
+ * @return
+ */
+int main_menu_window_create()
+{
+	if ((app_win = lv_obj_create(lv_scr_act())) == NULL)
+		return -1;
 
+	lv_obj_set_size(app_win, 135, 240);
+	lv_obj_center(app_win);
+	lv_obj_set_scrollbar_mode(app_win, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
 
+	static lv_style_t style;
+	lv_style_init(&style);
+	lv_style_set_radius(&style, 0); /* 设置样式圆角弧度为 直角 */
+	lv_style_set_border_side(&style, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
+	lv_style_set_bg_color(&style, lv_color_black());    /* 设置背景色为 黑色 */
+	lv_obj_add_style(app_win, &style, 0);
+
+	printf("main_menu_window_create ok\n");
+
+	return 0;
+}
+
+/**
+ * @brief 主菜单界面注册到界面管理器
+ * @return
+ */
+int page_main_menu_register()
+{
+	/* 创建新界面, 并注册到界面管理器 */
+	page_create(&page_main_menu, page_main_menu_setup, NULL, page_main_menu_exit, page_main_menu_event_handle);
+	page_register(&g_page_manager, &page_main_menu);
+
+	return 0;
+}
