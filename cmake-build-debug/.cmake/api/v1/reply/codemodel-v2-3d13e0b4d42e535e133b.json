@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "LvglWatch.elf::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-LvglWatch.elf-Debug-02b13a03e5a8b6f787ac.json",
+					"jsonFile" : "target-LvglWatch.elf-Debug-693ed3577034d289affb.json",
 					"name" : "LvglWatch.elf",
 					"projectIndex" : 0
 				}
@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/summer/Desktop/LvglWatch/cmake-build-debug",
-		"source" : "C:/Users/summer/Desktop/LvglWatch"
+		"build" : "C:/Users/summer/Desktop/LvglWatch-Backup/cmake-build-debug",
+		"source" : "C:/Users/summer/Desktop/LvglWatch-Backup"
 	},
 	"version" : 
 	{

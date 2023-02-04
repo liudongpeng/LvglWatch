@@ -19,10 +19,12 @@ lv_obj_t *app_window_create()
  * @param[in]	obj
  * @return
  */
-lv_coord_t get_app_window_width(const lv_obj_t *obj)
+lv_coord_t update_layout_and_get_obj_width(const lv_obj_t *obj)
 {
 	if (obj == NULL)
-		return -1;
+		return 0;
+
+	lv_obj_update_layout(obj);
 
 	return lv_obj_get_width(obj);
 }
@@ -32,12 +34,29 @@ lv_coord_t get_app_window_width(const lv_obj_t *obj)
  * @param[in]	obj
  * @return
  */
-lv_coord_t get_app_window_height(const lv_obj_t *obj)
+lv_coord_t update_layout_and_get_obj_height(const lv_obj_t *obj)
 {
 	if (obj == NULL)
-		return -1;
+		return 0;
+
+	lv_obj_update_layout(obj);
 
 	return lv_obj_get_height(obj);
+}
+
+/**
+ * @brief 更新obj对象所在屏幕, 并获取对象y坐标
+ * @param[in]	obj
+ * @return
+ */
+lv_coord_t update_layout_and_get_obj_y(const lv_obj_t *obj)
+{
+	if (obj == NULL)
+		return 0;
+
+	lv_obj_update_layout(obj);
+
+	return lv_obj_get_y(obj);
 }
 
 /**

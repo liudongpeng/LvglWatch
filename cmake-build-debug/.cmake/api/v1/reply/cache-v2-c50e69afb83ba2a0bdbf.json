@@ -163,7 +163,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/summer/Desktop/LvglWatch/cmake-build-debug"
+			"value" : "c:/Users/summer/Desktop/LvglWatch-Backup/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -651,7 +651,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/summer/Desktop/LvglWatch/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "C:/Users/summer/Desktop/LvglWatch-Backup/cmake-build-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -711,7 +711,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/summer/Desktop/LvglWatch"
+			"value" : "C:/Users/summer/Desktop/LvglWatch-Backup"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -1187,7 +1187,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/summer/Desktop/LvglWatch/cmake-build-debug"
+			"value" : "C:/Users/summer/Desktop/LvglWatch-Backup/cmake-build-debug"
 		},
 		{
 			"name" : "LvglWatch_IS_TOP_LEVEL",
@@ -1211,7 +1211,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/summer/Desktop/LvglWatch"
+			"value" : "C:/Users/summer/Desktop/LvglWatch-Backup"
 		}
 	],
 	"kind" : "cache",

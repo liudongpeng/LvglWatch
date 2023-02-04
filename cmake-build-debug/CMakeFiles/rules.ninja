@@ -54,7 +54,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = "C:\Program Files\JetBrains\CLion 2022.3.1\bin\cmake\win\x64\bin\cmake.exe" --regenerate-during-build -SC:\Users\summer\Desktop\LvglWatch -BC:\Users\summer\Desktop\LvglWatch\cmake-build-debug
+  command = "C:\Program Files\JetBrains\CLion 2022.3.1\bin\cmake\win\x64\bin\cmake.exe" --regenerate-during-build -SC:\Users\summer\Desktop\LvglWatch-Backup -BC:\Users\summer\Desktop\LvglWatch-Backup\cmake-build-debug
   description = Re-running CMake...
   generator = 1
 

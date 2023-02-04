@@ -69,6 +69,7 @@ include_directories(
         GUI/page_manager
 
         GUI/
+        GUI/font_src
         GUI/user_page
         GUI/user_page/image_src
         GUI/user_page/lvgl_obj_util
@@ -101,6 +102,7 @@ file(GLOB_RECURSE SOURCES "Core/*.*" "Middlewares/*.*" "Drivers/*.*"
         "GUI/page_manager/*.*"
 
         "GUI/*.*"
+        "GUI/font_src/*.*"
         "GUI/user_page/*.*"
         "GUI/user_page/image_src/*.*"
         "GUI/user_page/lvgl_obj_util/*.*"

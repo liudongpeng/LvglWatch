@@ -23,7 +23,7 @@ int bsp_display_init()
 		return -1;
 
 	/* 实例化显示器对象 */
-	ret = lcd_create(&g_lcd, &st, 240, 240);
+	ret = lcd_create(&g_lcd, &st, 135, 240);
 	if (ret < 0)
 		return -2;
 

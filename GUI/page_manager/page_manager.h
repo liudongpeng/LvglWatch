@@ -55,11 +55,10 @@ typedef struct page_manager
 {
 	page_t *page_list;  /* 界面列表 */
 
-	uint8_t last_page, cur_page, next_page;
-
-	uint8_t new_page, old_page;
 
 	uint8_t *page_stack;    /* 界面管理栈 */
+	uint8_t last_page, cur_page, next_page;
+	uint8_t new_page, old_page;
 	uint8_t page_stack_size, max_page_num;
 	int8_t page_stack_top;
 
@@ -67,30 +66,30 @@ typedef struct page_manager
 } page_manager_t;
 
 
-typedef void (*callback_func_t)();
-
-typedef void (*event_func_t)(void *, int);
+typedef void (*page_cb_t)();
+typedef void (*page_event_cb_t)(void *, int);
 
 
 int page_manager_create(page_manager_t *pm, uint8_t max_page_num, uint8_t page_stack_size);
 
-int page_create(page_t *page, callback_func_t page_setup, callback_func_t page_loop, callback_func_t page_exit,
-				event_func_t page_event_handle);
+int page_create(page_t *page, page_cb_t page_setup, page_cb_t page_loop, page_cb_t page_exit,
+                page_event_cb_t page_event_handle);
 
-int page_register(page_manager_t *pm, page_t *page);
+int page_register(page_manager_t *pm, uint8_t id, page_cb_t page_setup, page_cb_t page_loop, page_cb_t page_exit,
+                  page_event_cb_t page_event_handle);
 
-void page_clear(page_manager_t *pm, page_t *page);
+void page_clear(page_manager_t *pm, uint8_t id);
 
 void page_stack_clear(page_manager_t *pm);
 
-int page_push(page_manager_t *pm, page_t *page);
+int page_push(page_manager_t *pm, uint8_t id);
 int page_push_by_id(page_manager_t *pm, uint8_t id);
 
 int page_pop(page_manager_t *pm);
 
-int page_change(page_manager_t *pm, page_t *page);
+int page_change(page_manager_t *pm, uint8_t id);
 
-int page_event_transmit(page_manager_t *pm, void* obj, int event);
+void page_event_transmit(page_manager_t *pm, void* obj, int event);
 
 void page_run(page_manager_t *pm);
 

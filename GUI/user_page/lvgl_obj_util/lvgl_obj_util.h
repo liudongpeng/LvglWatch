@@ -13,8 +13,17 @@ extern "C" {
 #include "lvgl.h"
 
 
-#define APP_WIN_WIDTH(obj)  get_app_window_width(obj)
-#define APP_WIN_HEIGHT(obj) get_app_window_height(obj)
+/**
+ * @brief 获取窗口宽高
+ */
+#define APP_WIN_WIDTH(obj)  update_layout_and_get_obj_width(obj)
+#define APP_WIN_HEIGHT(obj) update_layout_and_get_obj_height(obj)
+
+
+/**
+ * @brief lvgl对象当前y坐标
+ */
+#define LV_OBJ_CUR_Y    y
 
 
 /**
@@ -24,11 +33,12 @@ extern "C" {
 do                                              \
 {                                               \
     static lv_anim_t anim;                      \
+                                                \
     lv_obj_add_anim(                            \
     (obj),                                      \
     (&anim),                                    \
     ((lv_anim_exec_xcb_t)lv_obj_set_##attr),    \
-    (lv_obj_get_##attr((obj))),                 \
+    (update_layout_and_get_obj_##attr((obj))),  \
     (tar),                                      \
     (time),                                     \
     (NULL),                                     \
@@ -36,10 +46,12 @@ do                                              \
 } while (0);
 
 
-
 lv_obj_t *app_window_create();
-lv_coord_t get_app_window_width(const lv_obj_t *obj);
-lv_coord_t get_app_window_height(const lv_obj_t *obj);
+
+lv_coord_t update_layout_and_get_obj_width(const lv_obj_t *obj);
+lv_coord_t update_layout_and_get_obj_height(const lv_obj_t *obj);
+
+lv_coord_t update_layout_and_get_obj_y(const lv_obj_t *obj);
 
 void lv_obj_add_anim(lv_obj_t *obj, lv_anim_t *anim, lv_anim_exec_xcb_t anim_exec_cb,
                      int start, int end, int time, lv_anim_ready_cb_t anim_ready_cb,

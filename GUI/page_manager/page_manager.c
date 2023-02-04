@@ -11,7 +11,7 @@
 /**
  * @brief 界面id合法性检查
  */
-#define CHECK_PAGE_ID(id) ((id) < (pm->max_page_num))
+#define CHECK_PAGE_ID(id) ((id) > 0 && (id) < (pm->max_page_num))
 
 
 /**
@@ -23,8 +23,8 @@
  * @param[in]	page_event_handle
  * @return
  */
-int page_create(page_t *page, callback_func_t page_setup, callback_func_t page_loop, callback_func_t page_exit,
-                event_func_t page_event_handle)
+int page_create(page_t *page, page_cb_t page_setup, page_cb_t page_loop, page_cb_t page_exit,
+                page_event_cb_t page_event_handle)
 {
 	/* 界面id, 编号从1开始递增, 因为page_new和page_old初始值都是0, 界面从0开始编号会影响界面切换 */
 	static uint8_t s_page_id = 1;
@@ -51,7 +51,7 @@ int page_create(page_t *page, callback_func_t page_setup, callback_func_t page_l
  * @param[in]	id
  * @return
  */
-page_t* get_page_by_id(page_manager_t* pm, uint8_t id)
+page_t *get_page_by_id(page_manager_t *pm, uint8_t id)
 {
 	if (pm == NULL)
 		return NULL;
@@ -74,18 +74,21 @@ int page_manager_create(page_manager_t *pm, uint8_t max_page_num, uint8_t page_s
 	if (pm == NULL)
 		return -1;
 
-	memset(pm, 0, sizeof(page_manager_t));
-
 	pm->max_page_num = max_page_num;
 	pm->page_stack_size = page_stack_size;
+	pm->page_stack_top = -1;
 
 	if ((pm->page_list = pvPortMalloc(sizeof(page_t) * max_page_num)) == NULL)
 		return -2;
+	for (int i = 0; i < max_page_num; i++)
+		page_clear(pm, i);
 
 	if ((pm->page_stack = pvPortMalloc(sizeof(uint8_t) * page_stack_size)) == NULL)
 		return -3;
+	page_stack_clear(pm);
 
-	pm->page_stack_top = -1;
+	pm->old_page = 0;
+	pm->new_page = 1;
 
 	return 0;
 }
@@ -96,27 +99,22 @@ int page_manager_create(page_manager_t *pm, uint8_t max_page_num, uint8_t page_s
  * @param[in]	page
  * @return
  */
-int page_register(page_manager_t *pm, page_t *page)
+int page_register(page_manager_t *pm, uint8_t id, page_cb_t page_setup, page_cb_t page_loop, page_cb_t page_exit,
+                  page_event_cb_t page_event_handle)
 {
-	uint8_t id;
-
-	if (pm == NULL || page == NULL)
+	if (pm == NULL)
 		return -1;
 
-	id = page->page_id;
 	if (!CHECK_PAGE_ID(id))
 		return -2;
 
-	printf("in page_register(), id = %d\n", id);
+	pm->page_list[id].page_setup = page_setup;
+	pm->page_list[id].page_loop = page_loop;
+	pm->page_list[id].page_exit = page_exit;
+	pm->page_list[id].page_event_handle = page_event_handle;
 
-	pm->page_list[id] = *page;
-
-	pm->page_list[id].page_setup = page->page_setup;
-	pm->page_list[id].page_loop = page->page_loop;
-	pm->page_list[id].page_exit = page->page_exit;
-	pm->page_list[id].page_event_handle = page->page_event_handle;
-
-	printf("pm->page_list[3].page_exit = %p\n", pm->page_list[id].page_exit);
+	printf("in page_register(), id = %d, ", id);
+	printf("page exit: %p\n", pm->page_list[id].page_exit);
 
 	return 0;
 }
@@ -126,20 +124,18 @@ int page_register(page_manager_t *pm, page_t *page)
  * @param[in]	pm
  * @param[in]	page
  */
-void page_clear(page_manager_t *pm, page_t *page)
+void page_clear(page_manager_t *pm, uint8_t id)
 {
-	uint8_t id;
-
-	if (pm == NULL || page == NULL)
+	if (pm == NULL)
 		return;
 
-	id = page->page_id;
 	if (!CHECK_PAGE_ID(id))
 		return;
 
-	/* 清空此界面所有的回调, 暂时保留此界面的id */
-	memset(&pm->page_list[id], 0, sizeof(page_t));
-	pm->page_list[id].page_id = id;
+	pm->page_list[id].page_setup = NULL;
+	pm->page_list[id].page_loop = NULL;
+	pm->page_list[id].page_exit = NULL;
+	pm->page_list[id].page_event_handle = NULL;
 }
 
 /**
@@ -159,7 +155,7 @@ void page_stack_clear(page_manager_t *pm)
 		pm->page_stack[i] = 0;
 	}
 
-	pm->page_stack_top = 0;
+	pm->page_stack_top = -1;
 }
 
 /**
@@ -192,7 +188,7 @@ int page_push_by_id(page_manager_t *pm, uint8_t id)
 	pm->page_stack[(pm->page_stack_top)++] = id;
 
 	/* 跳转到此界面 */
-	return page_change(pm, NULL);
+	return page_change(pm, id);
 }
 
 /**
@@ -201,14 +197,11 @@ int page_push_by_id(page_manager_t *pm, uint8_t id)
  * @param[in]	page
  * @return
  */
-int page_push(page_manager_t *pm, page_t *page)
+int page_push(page_manager_t *pm, uint8_t id)
 {
-	uint8_t id;
-
-	if (pm == NULL || page == NULL)
+	if (pm == NULL)
 		return -1;
 
-	id = page->page_id;
 	if (!CHECK_PAGE_ID(id))
 		return -2;
 
@@ -224,14 +217,11 @@ int page_push(page_manager_t *pm, page_t *page)
 	if (pm->page_stack[pm->page_stack_top] == id)
 		return -5;
 
-
 	/* 压栈 */
 	pm->page_stack[++pm->page_stack_top] = id;
 
-	printf("stack top = %d\n", pm->page_stack_top);
-
 	/* 跳转到此界面 */
-	return page_change(pm, page);
+	return page_change(pm, id);
 }
 
 /**
@@ -246,30 +236,19 @@ int page_pop(page_manager_t *pm)
 	if (pm == NULL)
 		return -1;
 
-	id = pm->page_stack[pm->page_stack_top];
-	if (!CHECK_PAGE_ID(id))
-		return -2;
-
 	/* 界面是否繁忙 */
 	if (pm->is_busy)
-		return -3;
+		return -2;
 
 	/* 栈空, 不做操作 */
 	if (pm->page_stack_top <= -1)
-		return -4;
+		return -2;
 
 	/* 清空此界面 */
-	page_clear(pm, &pm->page_list[id]);
+	pm->page_stack[pm->page_stack_top] = 0;
 
 	/* 切换到当前栈顶的界面 */
-	if (pm->page_stack_top > 0)
-	{
-		pm->page_stack_top--;
-		printf("stack top = %d\n", pm->page_stack_top);
-		return page_change(pm, &pm->page_list[pm->page_stack[pm->page_stack_top]]);
-	}
-
-	return 0;
+	return page_change(pm, pm->page_stack[--pm->page_stack_top]);
 }
 
 /**
@@ -278,27 +257,25 @@ int page_pop(page_manager_t *pm)
  * @param[in]	page
  * @return
  */
-int page_change(page_manager_t *pm, page_t *page)
+int page_change(page_manager_t *pm, uint8_t id)
 {
-	uint8_t id;
-
-	if (pm == NULL || page == NULL)
+	if (pm == NULL)
 		return -1;
 
-	/* 检查界面是否繁忙 */
-	if (pm->is_busy)
+	if (!CHECK_PAGE_ID(id))
 		return -2;
 
-	id = page->page_id;
-	if (!CHECK_PAGE_ID(id))
-		return -3;
+	/* 检查界面是否繁忙 */
+	if (!pm->is_busy)
+	{
+		/* 记录新界面id, 在page_run()中进行界面切换 */
+		pm->next_page = pm->new_page = id;
+		pm->is_busy = 1;
 
-	/* 记录新界面id, 在page_run()中进行界面切换 */
-	pm->next_page = pm->new_page = id;
+		return 0;
+	}
 
-	pm->is_busy = 1;
-
-	return 0;
+	return -3;
 }
 
 /**
@@ -306,20 +283,15 @@ int page_change(page_manager_t *pm, page_t *page)
  * @param[in]	pm
  * @param[in]	obj
  * @param[in]	event
- * @return
  */
-int page_event_transmit(page_manager_t *pm, void *obj, int event)
+void page_event_transmit(page_manager_t *pm, void *obj, int event)
 {
-	if (pm == NULL || obj == NULL)
-		return -1;
+	if (pm == NULL)
+		return;
 
-	if (pm->page_list[pm->cur_page].page_event_handle == NULL)
-		return -2;
-
-	/* 调用此界面的事件处理接口 */
-	pm->page_list[pm->cur_page].page_event_handle(obj, event);
-
-	return 0;
+	/* 把按键事件传递到界面 */
+	if (pm->page_list[pm->cur_page].page_event_handle != NULL)
+		pm->page_list[pm->cur_page].page_event_handle(obj, event);
 }
 
 /**
@@ -334,16 +306,17 @@ void page_run(page_manager_t *pm)
 	/* 界面切换事件 */
 	if (pm->new_page != pm->old_page)
 	{
-		printf("page change, old = %d, new = %d\n", pm->old_page, pm->new_page);
-
 		/* 标记为繁忙 */
 		pm->is_busy = 1;
 
+		printf("page change, old = %d, new = %d\n", pm->old_page, pm->new_page);
 		printf("pm->page_list[pm->old_page].page_exit = %p\n", pm->page_list[pm->old_page].page_exit);
 
 		/* 触发旧界面退出事件 */
 		if (CHECK_PAGE_ID(pm->old_page) && pm->page_list[pm->old_page].page_exit != NULL)
+		{
 			pm->page_list[pm->old_page].page_exit();
+		}
 
 		/* 标记旧界面 */
 		pm->last_page = pm->old_page;
@@ -372,4 +345,3 @@ void page_run(page_manager_t *pm)
 		}
 	}
 }
-

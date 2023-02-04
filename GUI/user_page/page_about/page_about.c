@@ -5,6 +5,7 @@
 #include "page_about.h"
 #include "bsp.h"
 #include "lvgl_obj_util.h"
+#include "user_page_private.h"
 #include <stdio.h>
 
 
@@ -23,16 +24,12 @@ static lv_obj_t *label_author;  /* 作者 */
 static lv_obj_t *label_fw_info; /* 固件信息 */
 
 
-static void title_create(const char *text);
-
-static void img_create();
-
-static void label_info_create();
+static void page_about_title_create(const char *text);
+static void page_about_img_create();
+static void page_about_label_info_create();
 
 static void page_about_setup();
-
 static void page_about_exit();
-
 static void page_about_event_handle(void *obj, int event);
 
 
@@ -40,8 +37,10 @@ static void page_about_event_handle(void *obj, int event);
  * @brief 创建界面标题
  * @param[in]	text
  */
-static void title_create(const char *text)
+static void page_about_title_create(const char *text)
 {
+	LV_FONT_DECLARE(HandGotn_20);
+
 	/* 创建标签 */
 	label_title = lv_label_create(app_win);
 	lv_label_set_text_static(label_title, text);
@@ -51,7 +50,7 @@ static void title_create(const char *text)
 	static lv_style_t style_label;
 	lv_style_init(&style_label);
 	lv_style_set_text_color(&style_label, lv_color_white());
-	lv_style_set_text_font(&style_label, &lv_font_montserrat_20);
+	lv_style_set_text_font(&style_label, &HandGotn_20);
 	lv_obj_add_style(label_title, &style_label, 0);
 
 	/* 创建标签下的分隔线 */
@@ -73,7 +72,7 @@ static void title_create(const char *text)
 /**
  * @brief 创建界面图片
  */
-static void img_create()
+static void page_about_img_create()
 {
 	LV_IMG_DECLARE(img_watchx_logo)
 
@@ -86,8 +85,10 @@ static void img_create()
 /**
  * @brief 创建信息标签
  */
-static void label_info_create()
+static void page_about_label_info_create()
 {
+	LV_FONT_DECLARE(HandGotn_14);
+
 	/* 作者标签控件 */
 	label_author = lv_label_create(app_win);
 	lv_label_set_text_static(label_author, "- DEVELOPER -");
@@ -95,7 +96,7 @@ static void label_info_create()
 	static lv_style_t style;
 	lv_style_init(&style);
 	lv_style_set_text_color(&style, lv_color_white());
-	lv_style_set_text_font(&style, lv_font_default());
+	lv_style_set_text_font(&style, &HandGotn_14);
 	lv_obj_add_style(label_author, &style, 0);
 
 	/* 固件信息标签控件 */
@@ -110,11 +111,13 @@ static void label_info_create()
  */
 static void page_about_setup()
 {
-//	lv_obj_move_foreground(app_win);
+	lv_obj_move_foreground(app_win);
 
-	title_create("About");
-	img_create();
-	label_info_create();
+	page_about_title_create("About");
+	page_about_img_create();
+	page_about_label_info_create();
+
+	printf("leave page_about_setup()\n\n");
 }
 
 /**
@@ -123,7 +126,8 @@ static void page_about_setup()
 static void page_about_exit()
 {
 	lv_obj_clean(app_win);
-	printf("page_about_exit()\n");
+
+	printf("leave page_about_exit()\n\n");
 }
 
 /**
@@ -139,8 +143,6 @@ static void page_about_event_handle(void *obj, int event)
 		{
 			/* 现在显示的是"关于"界面, 在此界面时, 只需要做退出此界面的操作 */
 			page_pop(&g_page_manager);
-
-			printf("page_about pop\n");
 		}
 	}
 }
@@ -163,6 +165,7 @@ int about_window_create()
 	lv_style_set_radius(&style, 0); /* 设置样式圆角为 直角 */
 	lv_style_set_border_side(&style, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
 	lv_style_set_bg_color(&style, lv_color_black());    /* 设置背景色为 黑色 */
+	lv_style_set_pad_all(&style, 0);    /* 设置上下左右全部padding大小为0 */
 	lv_obj_add_style(app_win, &style, 0);
 
 	return 0;
@@ -175,12 +178,14 @@ int about_window_create()
 int page_about_register()
 {
 	/* 创建新界面, 并注册到界面管理器 */
-	if (page_create(&page_about, page_about_setup, NULL, page_about_exit, page_about_event_handle) < 0)
-		printf("page_about create failed\n");
-	if (page_register(&g_page_manager, &page_about) < 0)
+	if (page_register(&g_page_manager, Page_About, page_about_setup, NULL,
+					  page_about_exit, page_about_event_handle) < 0)
+	{
 		printf("page_about register failed\n");
+		return -1;
+	}
 
-	printf("page_about_register() id = %d\n", page_about.page_id);
+	printf("leave page_about_register(), cur_page_exec = %p\n\n", g_page_manager.page_list[Page_About].page_exit);
 
 	return 0;
 }

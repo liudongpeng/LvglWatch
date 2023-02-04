@@ -4,6 +4,7 @@
 
 #include "bsp_button.h"
 #include "bsp_led.h"
+#include <stdio.h>
 
 
 extern page_manager_t g_page_manager;	/* 界面管理器, 在freertos.c文件中定义 */
@@ -56,9 +57,11 @@ static void button_event_handler(void* btn, int event)
 {
 	static uint8_t flag;
 
-	/* 将按键事件传递给界面 */
+	/* 将按键事件传递给界面, 有按键事件时调用此函数 */
 	page_event_transmit(&g_page_manager, btn, event);
 
 	flag = !flag;
 	flag ? led_open(&g_user_led) : led_close(&g_user_led);
+
+	printf("leave button_event_handler()\n\n");
 }

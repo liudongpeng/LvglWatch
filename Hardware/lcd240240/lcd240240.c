@@ -17,7 +17,7 @@
 /**
  * @brief lcd缓存, 30行
  */
-static lcd_color_t s_lcd_cache[240 * 30];
+//static lcd_color_t s_lcd_cache[240 * 30];
 
 
 
@@ -87,11 +87,20 @@ void lcd_clear(lcd_t* lcd)
 	lcd_set_window_area(lcd, 0, 0, lcd->width, lcd->height);
 
 	/* 内存写, 发送数据从MCU到帧内存(发送其他任何一个命令将打断帧写操作) */
-	lcd_write_cmd(lcd, &cmd, 1);
-	memset(s_lcd_cache, 0xFF, sizeof(s_lcd_cache));
-	for (int i = 0; i < LCD_PAGE_NUM; i++)
+//	lcd_write_cmd(lcd, &cmd, 1);
+//	memset(s_lcd_cache, 0xFF, sizeof(s_lcd_cache));
+//	for (int i = 0; i < LCD_PAGE_NUM; i++)
+//	{
+//		lcd_flush_page_cache(lcd);
+//	}
+
+	for (int i = 0; i < 240; i++)
 	{
-		lcd_flush_page_cache(lcd);
+		for (int j = 0; j < 240; j++)
+		{
+			uint16_t empty = 0xFFFF;
+			lcd_draw_point(lcd, j, i, (lcd_color_t)empty);
+		}
 	}
 }
 
@@ -135,7 +144,7 @@ int lcd_draw_point(lcd_t* lcd, int x, int y, lcd_color_t color)
 	lcd_set_window_area(lcd, x, y, 1, 1);
 
 	/* 进行内存写操作 */
-	lcd_write_cmd(lcd, &cmd, 1);
+//	lcd_write_cmd(lcd, &cmd, 1);
 	val[0] = color.full >> 8;
 	val[1] = color.full;
 	lcd_write_data(lcd, val, 2);
@@ -152,7 +161,7 @@ int lcd_draw_point(lcd_t* lcd, int x, int y, lcd_color_t color)
  */
 static int lcd_write_cmd(lcd_t* lcd, uint8_t* cmd_list, uint16_t len)
 {
-	if (lcd == NULL || cmd_list == NULL || len <= 0)
+	if (lcd == NULL)
 		return -1;
 
 	return st7789_write_cmd(lcd->drv, cmd_list, len);
@@ -221,7 +230,8 @@ int lcd_set_window_area(lcd_t *lcd, int x, int y, int width, int height)
 	cmd_list[3] = y1;
 	lcd_write_data(lcd, cmd_list, 4);
 
-	return 0;
+	cmd = ST7789_CMD_RAMWR;
+	return lcd_write_cmd(lcd, &cmd, 1);
 }
 
 /**
@@ -231,13 +241,14 @@ int lcd_set_window_area(lcd_t *lcd, int x, int y, int width, int height)
 int lcd_flush_page_cache(lcd_t* lcd)
 {
 	int byteToWrite = 0;
-	int remain = sizeof(s_lcd_cache);
+	int remain = 0;
 	int linePixelSize;
 	int ofs = 0;
 
 	if (lcd == NULL)
 		return -1;
 
+//	remain = sizeof(s_lcd_cache);
 	linePixelSize = lcd->width * sizeof(lcd_color_t);
 
 	/* 循环发送写入缓存中的数据 */
@@ -247,7 +258,7 @@ int lcd_flush_page_cache(lcd_t* lcd)
 		if (remain < linePixelSize)
 			byteToWrite = remain;
 
-		lcd_write_data(lcd, (uint8_t*)s_lcd_cache + ofs, byteToWrite);
+//		lcd_write_data(lcd, (uint8_t*)s_lcd_cache + ofs, byteToWrite);
 
 		ofs += byteToWrite;
 		remain -= byteToWrite;

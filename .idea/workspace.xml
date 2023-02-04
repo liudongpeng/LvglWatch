@@ -56,7 +56,8 @@
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;CMakeSettings&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.fileTypes&quot;,
     &quot;structure.view.defaults.are.configured&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -73,7 +74,7 @@
       </method>
     </configuration>
     <configuration name="LvglWatch.elf" type="com.jetbrains.cidr.embedded.openocd.conf.type" factoryName="com.jetbrains.cidr.embedded.openocd.conf.factory" nameIsGenerated="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="LvglWatch" TARGET_NAME="LvglWatch.elf" CONFIG_NAME="Debug" version="1" RUN_TARGET_PROJECT_NAME="LvglWatch" RUN_TARGET_NAME="LvglWatch.elf">
-      <openocd version="1" gdb-port="3333" telnet-port="4444" board-config="C:\Users\summer\Desktop\LvglWatch\stlink.cfg" reset-type="INIT" download-type="UPDATED_ONLY">
+      <openocd version="1" gdb-port="3333" telnet-port="4444" board-config="C:\Users\summer\Desktop\LvglWatch\stlink.cfg" reset-type="INIT" download-type="ALWAYS">
         <debugger toolchainName="MinGW-STM32" />
       </openocd>
       <method v="2">
@@ -104,6 +105,10 @@
       <workItem from="1675255552223" duration="8113000" />
       <workItem from="1675304392152" duration="19640000" />
       <workItem from="1675338901505" duration="11418000" />
+      <workItem from="1675401935247" duration="5855000" />
+      <workItem from="1675426514242" duration="8053000" />
+      <workItem from="1675439275847" duration="8284000" />
+      <workItem from="1675448123215" duration="42203000" />
     </task>
     <servers />
   </component>

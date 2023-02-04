@@ -41,7 +41,7 @@ static int app_windows_create()
 	if (about_window_create() < 0)
 	{
 		printf("about_window_create() failed"DEBUG_ERROR_INFO);
-		return -1;
+		return -3;
 	}
 
 	return 0;
@@ -73,16 +73,10 @@ static int app_pages_register()
 		printf("page_about_register() failed"DEBUG_ERROR_INFO);
 		return -3;
 	}
-	printf("page_about id = %d\n", page_about.page_id);
-
-//	printf("page_about id = %d\n", page_main_menu.page_id);
-//	printf("page_about addr = %p\n", &page_main_menu);
-//	printf("page_about addr = %p\n", get_page_by_id(&g_page_manager, Page_MainMenu));
-
 
 
 	/* 打开"表盘"界面 */
-	if (page_push(&g_page_manager, get_page_by_id(&g_page_manager, Page_Dial)) < 0)
+	if (page_push(&g_page_manager, Page_Dial) < 0)
 	{
 		printf("page_push() page_dial failed"DEBUG_ERROR_INFO);
 		return -3;
