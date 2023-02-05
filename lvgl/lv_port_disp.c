@@ -50,8 +50,8 @@ void lv_port_disp_init(void)
 	lv_disp_drv_init(&disp_drv);    /*Basic initialization*/
 
 	/* 设置屏幕大小 */
-	disp_drv.hor_res = /*(lv_coord_t)g_lcd.width*/135;
-	disp_drv.ver_res = /*(lv_coord_t)g_lcd.height*/240;
+	disp_drv.hor_res = (lv_coord_t)g_lcd.width;
+	disp_drv.ver_res = (lv_coord_t)g_lcd.height;
 
 	/*Used to copy the buffer's content to the display*/
 	disp_drv.flush_cb = disp_flush;
@@ -71,13 +71,10 @@ void lv_port_disp_init(void)
 void ending_exchange(uint16_t* a)
 {
 	printf("before: %#x, ", *a);
-	uint16_t result = 0;
-//	uint8_t* p = (uint8_t*)a;
-//	result = *p;
-//	result <<= 8;
-//	result &= p[1];
-//	*a = result;
-	printf("after: %#x, %#x\n", result, *a);
+	uint8_t lsb = *a;
+	*a <<= 8;
+	*a &= lsb;
+	printf("after: %#x\n", *a);
 }
 
 
@@ -97,17 +94,17 @@ static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_
 //		return;
 //	}
 //	memcpy(data, color_p, data_size);
-
+//
 //	printf("data_size = %lu, ", data_size);
 //	int count = data_size >> 1;
 //	for (int i = 0; i < count; i++)
-//		ending_exchange((uint16_t*)&color_p[i]);
-
+//		ending_exchange((uint16_t*)(color_p + i));
+//
 //	/* 设置显示区域 */
 //	lcd_set_window_area(&g_lcd, area->x1, area->y1, w, h);
 //	/* DMA发送请求 */
 //	disp_spi_dma_send(color_p, data_size);
-
+//
 //	vPortFree(data);
 
 

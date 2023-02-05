@@ -81,6 +81,12 @@ int st7789_init(st7789_t *st)
 	cmd_val[0] = 0x05;
 	st7789_write_data(st, cmd_val, 1);
 
+	/* 设置VCOM Offset */
+	cmd = ST7789_CMD_VCMOFSET;
+	st7789_write_cmd(st, &cmd, 1);
+	cmd_val[0] = 0x1A;
+	st7789_write_data(st, cmd_val, 1);
+
 	/* 设置页从上到下, 列从左到右, 从上到下刷新屏幕, RGB模式, 从左到右刷新屏幕 */
 	cmd = ST7789_CMD_MDACTL;
 	st7789_write_cmd(st, &cmd, 1);
@@ -90,8 +96,8 @@ int st7789_init(st7789_t *st)
 	/* 门廊控制(???啥意思???) */
 	cmd = ST7789_CMD_PORCTL;
 	st7789_write_cmd(st, &cmd, 1);
-	cmd_val[0] = 0x0C;
-	cmd_val[1] = 0x0C;
+	cmd_val[0] = 0x05;
+	cmd_val[1] = 0x05;
 	cmd_val[2] = 0x00;
 	cmd_val[3] = 0x33;
 	cmd_val[4] = 0x33;
@@ -100,13 +106,13 @@ int st7789_init(st7789_t *st)
 	/* 控制闸门(VGL是TFT屏的负电源输入脚, VGH是正电源输入脚) */
 	cmd = ST7789_CMD_GCTRL;
 	st7789_write_cmd(st, &cmd, 1);
-	cmd_val[0] = 0x35;
-	st7789_write_data(st, cmd_val, 1);
+	cmd_val[0] = 0x05;
+	st7789_write_data(st, cmd_val, 1);  /* 12.2V   -10.43V */
 
 	/* VCOM设置 */
 	cmd = ST7789_CMD_VCOMS;
 	st7789_write_cmd(st, &cmd, 1);
-	cmd_val[0] = 0x19;
+	cmd_val[0] = 0x3F;
 	st7789_write_data(st, cmd_val, 1);
 
 	/* LCM控制 */
@@ -124,7 +130,7 @@ int st7789_init(st7789_t *st)
 	/* 设置VRH */
 	cmd = ST7789_CMD_VRHS;
 	st7789_write_cmd(st, &cmd, 1);
-	cmd_val[0] = 0x12;
+	cmd_val[0] = 0x0F;
 	st7789_write_data(st, cmd_val, 1);
 
 	/* 设置VDV */
@@ -146,42 +152,56 @@ int st7789_init(st7789_t *st)
 	cmd_val[1] = 0xA1;
 	st7789_write_data(st, cmd_val, 2);
 
+	/* 电源控制2 */
+	cmd = ST7789_CMD_POWCTRL2;
+	st7789_write_cmd(st, &cmd, 1);
+	cmd_val[0] = 0x03;
+	st7789_write_data(st, cmd_val, 1);
+
+	/* 补偿时间控制 */
+	cmd = ST7789_CMD_EQCTRL;
+	st7789_write_cmd(st, &cmd, 1);
+	cmd_val[0] = 0x09;
+	cmd_val[1] = 0x09;
+	cmd_val[2] = 0x08;
+	st7789_write_data(st, cmd_val, 3);
+
 	/* 负电压闸门控制 */
 	cmd = ST7789_CMD_PVGAMCTRL;
 	st7789_write_cmd(st, &cmd, 1);
 	cmd_val[0] = 0xD0;
-	cmd_val[1] = 0x04;
-	cmd_val[2] = 0x0D;
-	cmd_val[3] = 0x11;
-	cmd_val[4] = 0x13;
-	cmd_val[5] = 0x2B;
-	cmd_val[6] = 0x3F;
-	cmd_val[7] = 0x54;
-	cmd_val[8] = 0x4C;
-	cmd_val[9] = 0x18;
-	cmd_val[10] = 0x0D;
-	cmd_val[11] = 0x0B;
-	cmd_val[12] = 0x1F;
-	cmd_val[13] = 0x23;
+	cmd_val[1] = 0x05;
+	cmd_val[2] = 0x09;
+	cmd_val[3] = 0x09;
+	cmd_val[4] = 0x08;
+	cmd_val[5] = 0x14;
+	cmd_val[6] = 0x28;
+	cmd_val[7] = 0x33;
+	cmd_val[8] = 0x3F;
+	cmd_val[9] = 0x07;
+	cmd_val[10] = 0x13;
+	cmd_val[11] = 0x14;
+	cmd_val[12] = 0x28;
+	cmd_val[13] = 0x30;
 	st7789_write_data(st, cmd_val, 14);
 
 	/* 正电压闸门控制 */
 	cmd = ST7789_CMD_NVGAMCTRL;
 	st7789_write_cmd(st, &cmd, 1);
 	cmd_val[0] = 0xD0;
-	cmd_val[1] = 0x04;
-	cmd_val[2] = 0x0C;
-	cmd_val[3] = 0x11;
-	cmd_val[4] = 0x13;
-	cmd_val[5] = 0x2C;
-	cmd_val[6] = 0x3F;
-	cmd_val[7] = 0x44;
-	cmd_val[8] = 0x51;
-	cmd_val[9] = 0x2F;
-	cmd_val[10] = 0x1F;
-	cmd_val[11] = 0x1F;
-	cmd_val[12] = 0x20;
-	cmd_val[13] = 0x23;
+	cmd_val[1] = 0x05;
+	cmd_val[2] = 0x09;
+	cmd_val[3] = 0x09;
+	cmd_val[4] = 0x08;
+	cmd_val[5] = 0x03;
+	cmd_val[6] = 0x24;
+	cmd_val[7] = 0x32;
+	cmd_val[8] = 0x32;
+	cmd_val[9] = 0x3B;
+	cmd_val[10] = 0x14;
+	cmd_val[11] = 0x13;
+	cmd_val[12] = 0x28;
+	cmd_val[13] = 0x2F;
 	st7789_write_data(st, cmd_val, 14);
 
 	/* 开启显示反转 */

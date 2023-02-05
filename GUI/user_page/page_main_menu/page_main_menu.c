@@ -269,7 +269,8 @@ static void page_main_menu_event_handle(void *btn, int event)
 				/* 单击确认按钮, 进入选中的页面 */
 				id = icon_grp[icon_idx_cur].page_id;
 				printf("in main_menu, cur_icon_idx = %d\n", icon_idx_cur);
-				page_push(&g_page_manager, id);
+				if (g_page_manager.page_list[id].page_setup != NULL)
+					page_push(&g_page_manager, id);
 				break;
 
 			default:
@@ -298,7 +299,7 @@ int main_menu_window_create()
 	if ((app_win = lv_obj_create(lv_scr_act())) == NULL)
 		return -1;
 
-	lv_obj_set_size(app_win, 135, 240);
+	lv_obj_set_size(app_win, APP_WIN_WIDTH(lv_scr_act()), APP_WIN_HEIGHT(lv_scr_act()));
 	lv_obj_set_scrollbar_mode(app_win, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
 	lv_obj_center(app_win);
 

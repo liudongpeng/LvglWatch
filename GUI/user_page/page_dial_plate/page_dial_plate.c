@@ -258,8 +258,9 @@ static void date_update()
 {
 	HAL_RTC_GetDate(&hrtc, &rtc_data, RTC_FORMAT_BIN);
 
-	const char *week[7] = LV_CALENDAR_DEFAULT_DAY_NAMES;    /* 定义在lv_conf.h文件中 */
+	const char *week[7] = { "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN" };
 	int idx = rtc_data.WeekDay - 1;
+	printf("rtc_data.WeekDay = %d\n", rtc_data.WeekDay);
 	if (idx < 0 || idx > 6)
 		idx = 0;
 	lv_label_set_text_fmt(label_date, "%02d#FF0000 /#%02d %s", rtc_data.Month, rtc_data.Date, week[idx]);
@@ -341,6 +342,7 @@ static void page_dial_setup()
 	page_dial_label_date_create();
 	page_dial_label_time_create();
 	page_dial_led_create();
+
 }
 
 /**
@@ -378,7 +380,7 @@ int dial_window_create()
 	if ((app_win = lv_obj_create(lv_scr_act())) == NULL)
 		return -1;
 
-	lv_obj_set_size(app_win, 135, 240);
+	lv_obj_set_size(app_win, APP_WIN_WIDTH(lv_scr_act()), APP_WIN_HEIGHT(lv_scr_act()));
 	lv_obj_center(app_win);
 	lv_obj_set_scrollbar_mode(app_win, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
 

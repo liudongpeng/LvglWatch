@@ -86,6 +86,8 @@ void lcd_clear(lcd_t* lcd)
 
 	lcd_set_window_area(lcd, 0, 0, lcd->width, lcd->height);
 
+
+
 	/* 内存写, 发送数据从MCU到帧内存(发送其他任何一个命令将打断帧写操作) */
 //	lcd_write_cmd(lcd, &cmd, 1);
 //	memset(s_lcd_cache, 0xFF, sizeof(s_lcd_cache));
@@ -94,12 +96,13 @@ void lcd_clear(lcd_t* lcd)
 //		lcd_flush_page_cache(lcd);
 //	}
 
-	for (int i = 0; i < 240; i++)
+	for (int i = 0; i < lcd->height; i++)
 	{
-		for (int j = 0; j < 240; j++)
+		for (int j = 0; j < lcd->width; j++)
 		{
 			uint16_t empty = 0xFFFF;
 			lcd_draw_point(lcd, j, i, (lcd_color_t)empty);
+
 		}
 	}
 }
@@ -215,8 +218,10 @@ int lcd_set_window_area(lcd_t *lcd, int x, int y, int width, int height)
 	/* 设置列起始地址和结束地址 */
 	cmd = ST7789_CMD_CASET;
 	lcd_write_cmd(lcd, &cmd, 1);
+	x += 52;
 	cmd_list[0] = x >> 8;
 	cmd_list[1] = x;
+	x1 += 52;
 	cmd_list[2] = x1 >> 8;
 	cmd_list[3] = x1;
 	lcd_write_data(lcd, cmd_list, 4);
@@ -224,8 +229,10 @@ int lcd_set_window_area(lcd_t *lcd, int x, int y, int width, int height)
 	/* 设置行起始地址和结束地址 */
 	cmd = ST7789_CMD_RASET;
 	lcd_write_cmd(lcd, &cmd, 1);
+	y += 40;
 	cmd_list[0] = y >> 8;
 	cmd_list[1] = y;
+	y1 += 40;
 	cmd_list[2] = y1 >> 8;
 	cmd_list[3] = y1;
 	lcd_write_data(lcd, cmd_list, 4);

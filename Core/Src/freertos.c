@@ -111,6 +111,17 @@ void MX_FREERTOS_Init(void) {
 	bsp_display_init();
 	lcd_clear(&g_lcd);
 
+	printf("w: %d, h:%d\n", g_lcd.width, g_lcd.height);
+
+	for (int i = 0; i < g_lcd.height; i++)
+	{
+		for (int j = 0; j < g_lcd.width; j++)
+		{
+			uint16_t empty = 0x0000;
+			lcd_draw_point(&g_lcd, j, i, (lcd_color_t)empty);
+		}
+	}
+
 	/* lvgl及显示驱动初始化 */
 	lv_init();
 	lv_port_disp_init();
@@ -121,6 +132,8 @@ void MX_FREERTOS_Init(void) {
 
 	/* 软件界面显示初始化 */
 	app_display_init();
+
+
 
 
   /* USER CODE END Init */
