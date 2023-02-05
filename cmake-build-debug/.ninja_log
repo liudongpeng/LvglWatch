@@ -632,3 +632,5 @@
 205	492	6973119229874693	LvglWatch.elf	c3b085b07ff55eef
 8	227	6973119394656723	CMakeFiles/LvglWatch.elf.dir/GUI/user_page/page_main_menu/page_main_menu.c.obj	da3e1b2b09e07ee7
 228	509	6973119397057323	LvglWatch.elf	c3b085b07ff55eef
+9	126	6973148284247416	CMakeFiles/LvglWatch.elf.dir/Core/Src/rtc.c.obj	b08dd1d4a8556057
+127	462	6973148287137940	LvglWatch.elf	c3b085b07ff55eef
