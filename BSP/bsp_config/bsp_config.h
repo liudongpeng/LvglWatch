@@ -39,8 +39,8 @@ uint32_t btn_get_tick();
 
 
 /* ------------------------------ display ------------------------------ */
-#define SCREEN_SPI	SPI2			/* 屏幕SPI接口 */
-#define SCREEN_SPI_HANDLER	hspi2	/* 屏幕SPI接口句柄 */
+#define SCREEN_SPI	SPI1			/* 屏幕SPI接口 */
+#define SCREEN_SPI_HANDLER	hspi1	/* 屏幕SPI接口句柄 */
 
 #define LVGL_TICK_TIM TIM2          /* lvgl tick定时器 */
 #define LVGL_TICK_TIM_HANDLE  htim2 /* lvgl tick定时器句柄 */

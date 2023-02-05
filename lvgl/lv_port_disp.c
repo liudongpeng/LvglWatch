@@ -14,7 +14,7 @@
 
 #define LV_HOR_RES_MAX  135
 #define LV_VER_RES_MAX  240
-#define DISP_BUF_SIZE   (LV_HOR_RES_MAX * 10)
+#define DISP_BUF_SIZE   (LV_HOR_RES_MAX * 20)
 
 
 

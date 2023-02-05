@@ -260,7 +260,6 @@ static void date_update()
 
 	const char *week[7] = { "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN" };
 	int idx = rtc_data.WeekDay - 1;
-	printf("rtc_data.WeekDay = %d\n", rtc_data.WeekDay);
 	if (idx < 0 || idx > 6)
 		idx = 0;
 	lv_label_set_text_fmt(label_date, "%02d#FF0000 /#%02d %s", rtc_data.Month, rtc_data.Date, week[idx]);
