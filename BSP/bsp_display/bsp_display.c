@@ -5,7 +5,7 @@
 #include "bsp_display.h"
 
 
-static st7789_t st; /* ST7789驱动IC对象 */
+st7789_t st; /* ST7789驱动IC对象 */
 lcd_t g_lcd;  /* 显示器对象 */
 
 

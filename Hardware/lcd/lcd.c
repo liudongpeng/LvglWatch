@@ -2,10 +2,12 @@
 // Created by liudongpeng on 2022/11/17.
 //
 
-#include "lcd240240.h"
+#include "lcd.h"
 #include <stdio.h>
 #include <string.h>
 
+#include "main.h"
+#include "bsp_config.h"
 
 /**
  * @brief 把屏幕分成8页, 由上到下0~7, 每页30行
@@ -17,9 +19,11 @@
 /**
  * @brief lcd缓存, 30行
  */
-//static lcd_color_t s_lcd_cache[240 * 30];
+//static uint8_t s_lcd_cache[135 * 120 * sizeof(uint16_t)];
 
 
+
+static uint16_t endian_exchange_u16(uint16_t* a);
 
 static int lcd_write_cmd(lcd_t* lcd, uint8_t* cmd_list, uint16_t len);
 static int lcd_write_data(lcd_t* lcd, uint8_t* data_list, uint16_t len);
@@ -86,8 +90,6 @@ void lcd_clear(lcd_t* lcd)
 
 	lcd_set_window_area(lcd, 0, 0, lcd->width, lcd->height);
 
-
-
 	/* 内存写, 发送数据从MCU到帧内存(发送其他任何一个命令将打断帧写操作) */
 //	lcd_write_cmd(lcd, &cmd, 1);
 //	memset(s_lcd_cache, 0xFF, sizeof(s_lcd_cache));
@@ -139,7 +141,7 @@ int lcd_full(lcd_t* lcd, lcd_color_t color)
 int lcd_draw_point(lcd_t* lcd, int x, int y, lcd_color_t color)
 {
 	uint8_t cmd = ST7789_CMD_RAMWR;
-	uint8_t val[2];
+	uint8_t val[2] = {color >> 8, color};
 
 	if (lcd == NULL)
 		return -1;
@@ -148,9 +150,13 @@ int lcd_draw_point(lcd_t* lcd, int x, int y, lcd_color_t color)
 
 	/* 进行内存写操作 */
 //	lcd_write_cmd(lcd, &cmd, 1);
-	val[0] = color.full >> 8;
-	val[1] = color.full;
-	lcd_write_data(lcd, val, 2);
+
+//	val[0] = color >> 8;
+//	val[1] = color;
+	return lcd_write_data(lcd, val, 2);
+
+//	HAL_SPI_Transmit_DMA(&hspi2, val, 2);
+//	while (HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
 
 	return 0;
 }
@@ -221,7 +227,7 @@ int lcd_set_window_area(lcd_t *lcd, int x, int y, int width, int height)
 	x += 52;
 	cmd_list[0] = x >> 8;
 	cmd_list[1] = x;
-	x1 += 52;
+	x1 += 51;
 	cmd_list[2] = x1 >> 8;
 	cmd_list[3] = x1;
 	lcd_write_data(lcd, cmd_list, 4);
@@ -229,16 +235,87 @@ int lcd_set_window_area(lcd_t *lcd, int x, int y, int width, int height)
 	/* 设置行起始地址和结束地址 */
 	cmd = ST7789_CMD_RASET;
 	lcd_write_cmd(lcd, &cmd, 1);
-	y += 40;
+	y += 39;
 	cmd_list[0] = y >> 8;
 	cmd_list[1] = y;
-	y1 += 40;
+	y1 += 39;
 	cmd_list[2] = y1 >> 8;
 	cmd_list[3] = y1;
 	lcd_write_data(lcd, cmd_list, 4);
 
 	cmd = ST7789_CMD_RAMWR;
 	return lcd_write_cmd(lcd, &cmd, 1);
+}
+
+/**
+ * @brief 大小端互转
+ * @param[in]	num
+ * @return
+ */
+static uint16_t endian_exchange_u16(uint16_t* num)
+{
+	printf("before: %#x, ", *num);
+	uint8_t lsb = (*num >> 8);
+	*num <<= 8;
+	*num |= lsb;
+	printf("after: %#x\n", *num);
+
+	return *num;
+}
+
+/**
+ * @brief 把lvgl颜色转换为lcd颜色
+ * @param[in,out] lv_color
+ * @return
+ */
+static lcd_color_t lv_color_convert(uint16_t* lv_color)
+{
+
+}
+
+
+/**
+ *
+ * @param a
+ * @param b
+ */
+static void swap_u8(uint8_t* a, uint8_t* b)
+{
+	uint8_t tmp = *a;
+	*a = *b;
+	*b = tmp;
+}
+
+/**
+ * @brief 区域绘制
+ * @param[in]	lcd
+ * @param[in]	x
+ * @param[in]	y
+ * @param[in]	width
+ * @param[in]	height
+ * @param[in]	buf
+ * @return
+ */
+int lcd_draw_area(lcd_t* lcd, int x, int y, int width, int height, uint8_t* buf)
+{
+	if (lcd == NULL)
+		return -1;
+
+	if (width <= 0 || height <= 0)
+		return -2;
+
+	uint32_t byte_num = width * height * sizeof(uint16_t);
+//	memset(s_lcd_cache, 0, sizeof(s_lcd_cache));
+//	memcpy(s_lcd_cache, buf, byte_num);
+//
+//	uint32_t idx = byte_num - 1;
+//	for (uint32_t i = 0; i < idx; i += 2)
+//	{
+//		swap_u8(&s_lcd_cache[i], &s_lcd_cache[i + 1]);
+//	}
+
+	lcd_set_window_area(lcd, x, y, width, height);
+	return lcd_write_data(lcd, buf, byte_num);
 }
 
 /**

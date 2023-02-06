@@ -13,12 +13,12 @@ extern page_manager_t g_page_manager;    /* 界面管理器, 在freertos.c文件中定义 *
 
 page_t page_about;    /* "关于"界面, 以此来进行界面管理 */
 
-static lv_obj_t *app_win;   /* "关于"界面窗口, 用于绘制其他控件 */
+static lv_obj_t *app_win;       /* "关于"界面窗口, 用于绘制其他控件 */
 
 static lv_obj_t *label_title;   /* 标题标签 */
 static lv_obj_t *line_title;    /* 标题分割线 */
 
-static lv_obj_t *img_logo;  /* 图片logo */
+static lv_obj_t *img_logo;      /* 图片logo */
 
 static lv_obj_t *label_author;  /* 作者 */
 static lv_obj_t *label_fw_info; /* 固件信息 */
@@ -116,8 +116,6 @@ static void page_about_setup()
 	page_about_title_create("About");
 	page_about_img_create();
 	page_about_label_info_create();
-
-	printf("leave page_about_setup()\n\n");
 }
 
 /**
@@ -126,8 +124,6 @@ static void page_about_setup()
 static void page_about_exit()
 {
 	lv_obj_clean(app_win);
-
-	printf("leave page_about_exit()\n\n");
 }
 
 /**
@@ -137,14 +133,8 @@ static void page_about_exit()
  */
 static void page_about_event_handle(void *obj, int event)
 {
-	if (obj == &g_btn_ok)
-	{
-		if (event == ButtonEvent_SingleClick)
-		{
-			/* 现在显示的是"关于"界面, 在此界面时, 只需要做退出此界面的操作 */
-			page_pop(&g_page_manager);
-		}
-	}
+	/* 现在显示的是"关于"界面, 在此界面时, 只需要做退出此界面的操作 */
+	page_pop(&g_page_manager);
 }
 
 /**
@@ -156,9 +146,10 @@ int about_window_create()
 	if ((app_win = lv_obj_create(lv_scr_act())) == NULL)
 		return -1;
 
-	lv_obj_set_size(app_win, APP_WIN_WIDTH(lv_scr_act()), APP_WIN_HEIGHT(lv_scr_act()));
-	lv_obj_center(app_win);
 	lv_obj_set_scrollbar_mode(app_win, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
+//	lv_obj_set_size(app_win, APP_WIN_WIDTH(lv_scr_act()), APP_WIN_HEIGHT(lv_scr_act()));
+	lv_obj_set_size(app_win, 135, 240);
+	lv_obj_center(app_win);
 
 	static lv_style_t style;
 	lv_style_init(&style);
@@ -184,8 +175,6 @@ int page_about_register()
 		printf("page_about register failed\n");
 		return -1;
 	}
-
-	printf("leave page_about_register(), cur_page_exec = %p\n\n", g_page_manager.page_list[Page_About].page_exit);
 
 	return 0;
 }

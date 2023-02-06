@@ -148,8 +148,8 @@ static void page_dial_label_time_create()
 
 	static lv_style_t style_time_cont;
 	lv_style_init(&style_time_cont);
-//	lv_style_set_radius(&style_time_cont, 0); /* 设置边框弧度 */
-//	lv_style_set_border_color(&style_time_cont, lv_color_make(0xff, 0, 0));
+	lv_style_set_radius(&style_time_cont, 0); /* 设置边框弧度 */
+	lv_style_set_border_color(&style_time_cont, lv_color_make(0xff, 0, 0));
 	lv_style_set_border_side(&style_time_cont, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
 	lv_style_set_pad_all(&style_time_cont, 0);    /* 设置此窗口上下左右全部padding大小为0 */
 	lv_obj_add_style(time_cont, &style_time_cont, 0);
@@ -161,6 +161,7 @@ static void page_dial_label_time_create()
 	lv_style_set_text_color(&style_label_time, lv_color_white());
 	lv_style_set_text_font(&style_label_time, &Morganite_100);
 
+//	time_update();
 	const static lv_coord_t x_pos[4] = {-45, -20, 20, 45};
 	for (int i = 0; i < sizeof(label_time_grp) / sizeof(label_time_grp[0]); i++)
 	{
@@ -182,7 +183,7 @@ static void page_dial_label_time_create()
 		label_time_grp_bk[i] = label;
 	}
 
-	memset(&rtc_time_last, 0, sizeof(rtc_time_last));
+//	memset(&rtc_time_last, 0, sizeof(rtc_time_last));
 	/* 创建时间更新任务 */
 	timer_time_update = lv_timer_create(timer_task_time_update, 500, NULL);
 
@@ -244,8 +245,8 @@ static void timer_task_time_update(lv_timer_t *timer)
 	time_update();
 
 	/* 反转led */
-	for (int i = 0; i < sizeof(led_sec) / sizeof(led_sec[0]); i++)
-		lv_led_toggle(led_sec[i]);
+	lv_led_toggle(led_sec[0]);
+	lv_led_toggle(led_sec[1]);
 
 	/* 更新日期标签 */
 	date_update();
@@ -263,6 +264,9 @@ static void date_update()
 	if (idx < 0 || idx > 6)
 		idx = 0;
 	lv_label_set_text_fmt(label_date, "%02d#FF0000 /#%02d %s", rtc_data.Month, rtc_data.Date, week[idx]);
+
+	/* 日期备份 */
+	bsp_rtc_date_backup();
 };
 
 /**
@@ -326,6 +330,9 @@ static void time_update()
 	LABEL_TIME_UPDATE_IF_VAL_CHANGE(rtc_time.Hours / 10, rtc_time_last.Hours / 10, 0);
 
 	rtc_time_last = rtc_time;
+
+	/* 把当前时间做备份 */
+//	bsp_rtc_time_backup();
 }
 
 
@@ -350,8 +357,10 @@ static void page_dial_setup()
 static void page_dial_exit()
 {
 	/* 关闭任务栏和时间日期更新任务 */
-	lv_timer_del(timer_state_bar_update);
-	lv_timer_del(timer_time_update);
+	if (timer_state_bar_update != NULL)
+		lv_timer_del(timer_state_bar_update);
+	if (timer_time_update != NULL)
+		lv_timer_del(timer_time_update);
 
 	lv_obj_clean(app_win);
 }
@@ -364,10 +373,7 @@ static void page_dial_exit()
 static void page_dial_event_handle(void *obj, int event)
 {
 	/* 有按键发生动作时, 进入主菜单 */
-	if (event == ButtonEvent_SingleClick || event == ButtonEvent_LongPressHold)
-	{
-		page_push(&g_page_manager, Page_MainMenu);
-	}
+	page_push(&g_page_manager, Page_MainMenu);
 }
 
 /**
@@ -379,13 +385,15 @@ int dial_window_create()
 	if ((app_win = lv_obj_create(lv_scr_act())) == NULL)
 		return -1;
 
-	lv_obj_set_size(app_win, APP_WIN_WIDTH(lv_scr_act()), APP_WIN_HEIGHT(lv_scr_act()));
-	lv_obj_center(app_win);
 	lv_obj_set_scrollbar_mode(app_win, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
+//	lv_obj_set_size(app_win, APP_WIN_WIDTH(lv_scr_act()), APP_WIN_HEIGHT(lv_scr_act()));
+	lv_obj_set_size(app_win, 135, 240);
+	lv_obj_center(app_win);
+
 
 	static lv_style_t style;
 	lv_style_init(&style);
-//	lv_style_set_radius(&style, 0); /* 设置样式圆角弧度为 直角 */
+	lv_style_set_radius(&style, 0); /* 设置样式圆角弧度为 直角 */
 	lv_style_set_border_side(&style, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
 	lv_style_set_bg_color(&style, lv_color_black());    /* 设置背景色为 黑色 */
 	lv_style_set_pad_all(&style, 0);    /* 设置上下左右全部padding大小为0 */

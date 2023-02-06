@@ -56,18 +56,17 @@ typedef struct lcd
 /**
  * @brief lcdÏñËØÑÕÉ«
  */
-typedef union
-{
-	struct pixel_color
-	{
-		uint16_t b: 5;
-		uint16_t g: 6;
-		uint16_t r: 5;
-	} color;
-
-	uint16_t full;
-
-} lcd_color_t;
+typedef uint16_t lcd_color_t;
+//typedef union
+//{
+//	struct pixel_color
+//	{
+//		uint16_t b: 5;
+//		uint16_t g: 6;
+//		uint16_t r: 5;
+//	} color;
+//	uint16_t full;
+//} lcd_color_t;
 
 
 
@@ -78,6 +77,7 @@ void lcd_clear(lcd_t* lcd);
 int lcd_full(lcd_t* lcd, lcd_color_t color);
 int lcd_draw_point(lcd_t* lcd, int x, int y, lcd_color_t color);
 int lcd_set_window_area(lcd_t *lcd, int x, int y, int width, int height);
+int lcd_draw_area(lcd_t* lcd, int x, int y, int width, int height, uint8_t* buf);
 
 int lcd_set_pixel_color(lcd_color_t* pixel_color, uint16_t color);
 

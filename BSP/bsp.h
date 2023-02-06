@@ -10,6 +10,7 @@ extern "C" {
 #endif
 
 
+#include "bsp_rtc.h"
 #include "bsp_button.h"
 #include "bsp_led.h"
 #include "bsp_display.h"

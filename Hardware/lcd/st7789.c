@@ -78,7 +78,7 @@ int st7789_init(st7789_t *st)
 	/* 101 = 16bit/pixel */
 	cmd = ST7789_CMD_COLMOD;
 	st7789_write_cmd(st, &cmd, 1);
-	cmd_val[0] = 0x05;
+	cmd_val[0] = 0x65;
 	st7789_write_data(st, cmd_val, 1);
 
 	/* ÉèÖÃVCOM Offset */
@@ -254,7 +254,6 @@ int st7789_write_cmd(st7789_t *st, uint8_t *cmd_list, uint16_t len)
 	LCD_CS_RESET();
 	LCD_DC_RESET();
 	st->spi_write(cmd_list, len);
-	LCD_DC_SET();
 	LCD_CS_SET();
 	return 0;
 }
@@ -274,7 +273,6 @@ int st7789_write_data(st7789_t *st, uint8_t *data_list, uint16_t len)
 	LCD_CS_RESET();
 	LCD_DC_SET();
 	st->spi_write(data_list, len);
-	LCD_DC_RESET();
 	LCD_CS_SET();
 	return 0;
 }

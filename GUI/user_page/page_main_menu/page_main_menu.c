@@ -119,7 +119,7 @@ static void page_main_menu_icon_grp_create()
 {
 	/* 创建图标显示窗口 */
     icon_disp = lv_obj_create(app_win);
-    lv_obj_set_size(icon_disp, ICON_SIZE + 20 + 40,
+    lv_obj_set_size(icon_disp, ICON_SIZE + 20,
 					APP_WIN_HEIGHT(app_win) - update_layout_and_get_obj_y(line_title) - 20);
     lv_obj_set_scrollbar_mode(icon_disp, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
     lv_obj_set_style_bg_opa(icon_disp, LV_OPA_TRANSP, 0);   /* 设置背景透明 */
@@ -128,7 +128,7 @@ static void page_main_menu_icon_grp_create()
     static lv_style_t style_icon_disp;
     lv_style_init(&style_icon_disp);
     lv_style_set_radius(&style_icon_disp, 0); /* 设置边框弧度 */
-//    lv_style_set_border_side(&style_icon_disp, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
+    lv_style_set_border_side(&style_icon_disp, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
 	lv_style_set_pad_all(&style_icon_disp, 0);    /* 设置此窗口上下左右全部padding大小为0 */
     lv_obj_add_style(icon_disp, &style_icon_disp, 0);
 
@@ -145,8 +145,8 @@ static void page_main_menu_icon_grp_create()
     lv_style_init(&style_icon_cont);
     lv_style_set_border_color(&style_icon_cont, lv_color_make(0xff, 0, 0));
     lv_style_set_radius(&style_icon_cont, 0); /* 设置边框弧度 */
-//    lv_style_set_border_side(&style_icon_cont, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
-//	lv_style_set_pad_all(&style_icon_cont, 0);    /* 设置此窗口上下左右全部padding大小为0 */
+    lv_style_set_border_side(&style_icon_cont, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
+	lv_style_set_pad_all(&style_icon_cont, 0);    /* 设置此窗口上下左右全部padding大小为0 */
     lv_obj_add_style(icon_cont, &style_icon_cont, 0);
 
     for (int i = 0; i < ICON_COUNT; i++)
@@ -268,7 +268,7 @@ static void page_main_menu_event_handle(void *btn, int event)
 			case ButtonEvent_SingleClick:
 				/* 单击确认按钮, 进入选中的页面 */
 				id = icon_grp[icon_idx_cur].page_id;
-				printf("in main_menu, cur_icon_idx = %d\n", icon_idx_cur);
+				printf("in page_main_menu_event_handle(), cur_icon_idx = %d\n", icon_idx_cur);
 				if (g_page_manager.page_list[id].page_setup != NULL)
 					page_push(&g_page_manager, id);
 				break;
@@ -299,8 +299,9 @@ int main_menu_window_create()
 	if ((app_win = lv_obj_create(lv_scr_act())) == NULL)
 		return -1;
 
-	lv_obj_set_size(app_win, APP_WIN_WIDTH(lv_scr_act()), APP_WIN_HEIGHT(lv_scr_act()));
 	lv_obj_set_scrollbar_mode(app_win, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
+//	lv_obj_set_size(app_win, APP_WIN_WIDTH(lv_scr_act()), APP_WIN_HEIGHT(lv_scr_act()));
+	lv_obj_set_size(app_win, 135, 240);
 	lv_obj_center(app_win);
 
 	static lv_style_t style;

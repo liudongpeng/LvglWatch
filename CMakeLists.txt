@@ -54,13 +54,14 @@ include_directories(
         Hardware/led
         Hardware/button
         Hardware/bmp280
-        Hardware/lcd240240
+        Hardware/lcd
         Hardware/sht21
 
         lvgl
         lvgl/src
 
         BSP
+        BSP/bsp_rtc
         BSP/bsp_config
         BSP/bsp_button
         BSP/bsp_led
@@ -88,12 +89,13 @@ file(GLOB_RECURSE SOURCES "Core/*.*" "Middlewares/*.*" "Drivers/*.*"
         "Hardware/led/*.*"
         "Hardware/button/*.*"
         "Hardware/bmp280/*.*"
-        "Hardware/lcd240240/*.*"
+        "Hardware/lcd/*.*"
         "Hardware/sht21/*.*"
 
         "lvgl/*.*"
 
         "BSP/bsp.h"
+        "BSP/bsp_rtc/*.*"
         "BSP/bsp_config/*.*"
         "BSP/bsp_button/*.*"
         "BSP/bsp_led/*.*"

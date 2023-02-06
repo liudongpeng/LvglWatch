@@ -11,7 +11,7 @@ extern "C" {
 
 
 #include "bsp_config.h"
-#include "lcd240240.h"
+#include "lcd.h"
 
 
 extern lcd_t g_lcd;  /* ÏÔÊ¾Æ÷¶ÔÏó */
