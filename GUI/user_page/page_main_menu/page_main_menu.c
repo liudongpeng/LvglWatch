@@ -49,6 +49,7 @@ static icon_t icon_grp[] = {
 	{.icon_data = &icon_mountain,   .icon_name = "Altitude",    .page_id = Page_Altitude},  /* 海拔高度 */
 	{.icon_data = &icon_light,      .icon_name = "BackLight",   .page_id = Page_BackLight}, /* 亮度 */
 	{.icon_data = &icon_time_cfg,   .icon_name = "TimeCfg",     .page_id = Page_TimeCfg},   /* 时间设置 */
+	{.icon_data = &icon_theme,      .icon_name = "Theme",       .page_id = Page_Theme},     /* 时间设置 */
 	{.icon_data = &icon_info,       .icon_name = "About",       .page_id = Page_About},     /* 关于 */
 };
 
@@ -104,12 +105,6 @@ static void page_main_menu_title_create()
 	lv_style_set_line_width(&style_line, 2);
 	lv_style_set_line_rounded(&style_line, true);
 	lv_obj_add_style(line_title, &style_line, 0);
-
-	lv_obj_update_layout(app_win);
-	printf("in title_create(), update_layout_and_get_obj_y(label_title) = %d\n",
-		   update_layout_and_get_obj_y(label_title));
-	printf("in title_create(), update_layout_and_get_obj_y(line_title) = %d\n",
-	       update_layout_and_get_obj_y(line_title));
 }
 
 /**
@@ -123,13 +118,13 @@ static void page_main_menu_icon_grp_create()
 					APP_WIN_HEIGHT(app_win) - update_layout_and_get_obj_y(line_title) - 20);
     lv_obj_set_scrollbar_mode(icon_disp, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
     lv_obj_set_style_bg_opa(icon_disp, LV_OPA_TRANSP, 0);   /* 设置背景透明 */
-	lv_obj_align(icon_disp, LV_ALIGN_BOTTOM_MID, 0, 10);
+	lv_obj_align_to(icon_disp, line_title, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
 
     static lv_style_t style_icon_disp;
     lv_style_init(&style_icon_disp);
-    lv_style_set_radius(&style_icon_disp, 0); /* 设置边框弧度 */
+	lv_style_set_pad_all(&style_icon_disp, 0);      /* 设置此窗口上下左右全部padding大小为0 */
+    lv_style_set_radius(&style_icon_disp, 0);       /* 设置边框弧度 */
     lv_style_set_border_side(&style_icon_disp, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
-	lv_style_set_pad_all(&style_icon_disp, 0);    /* 设置此窗口上下左右全部padding大小为0 */
     lv_obj_add_style(icon_disp, &style_icon_disp, 0);
 
 
@@ -137,16 +132,16 @@ static void page_main_menu_icon_grp_create()
     icon_cont = lv_obj_create(icon_disp);
     lv_obj_set_style_bg_opa(icon_cont, LV_OPA_TRANSP, 0);   /* 设置对象背景透明 */
     lv_obj_set_scrollbar_mode(icon_cont, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
-    lv_obj_center(icon_cont);
-    lv_obj_set_size(icon_cont, /*lv_obj_get_width(icon_disp)*/70, (ICON_SIZE + ICON_INTERVAL) * ICON_COUNT);
+    lv_obj_set_size(icon_cont, update_layout_and_get_obj_width(icon_disp), (ICON_SIZE + ICON_INTERVAL) * ICON_COUNT);
+	lv_obj_center(icon_cont);
     lv_obj_set_y(icon_cont, update_layout_and_get_obj_height(icon_disp));
 
     static lv_style_t style_icon_cont;
     lv_style_init(&style_icon_cont);
+	lv_style_set_pad_all(&style_icon_cont, 0);    /* 设置此窗口上下左右全部padding大小为0 */
     lv_style_set_border_color(&style_icon_cont, lv_color_make(0xff, 0, 0));
     lv_style_set_radius(&style_icon_cont, 0); /* 设置边框弧度 */
     lv_style_set_border_side(&style_icon_cont, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
-	lv_style_set_pad_all(&style_icon_cont, 0);    /* 设置此窗口上下左右全部padding大小为0 */
     lv_obj_add_style(icon_cont, &style_icon_cont, 0);
 
     for (int i = 0; i < ICON_COUNT; i++)
@@ -157,7 +152,7 @@ static void page_main_menu_icon_grp_create()
 
         /* 计算每个图标的偏移量, 把所有图标从上到下依次摆放 */
         int ofs_y = (ICON_SIZE - update_layout_and_get_obj_height(icon)) / 2;
-        lv_obj_set_y(icon, ((ICON_SIZE + ICON_INTERVAL) * i) + ofs_y);
+        lv_obj_set_y(icon, ((ICON_SIZE + ICON_INTERVAL) * i) + 0);
 
 	    icon_grp[i].img_icon = icon;
     }
@@ -196,10 +191,9 @@ static void page_main_menu_icon_grp_move_focus(uint8_t idx)
 
 	/* 计算目标y位置 */
 	int tar_y = -(ICON_SIZE + ICON_INTERVAL) * (idx - 1);
-	printf("in icon_grp_move_focus(), idx = %d\n", idx);
 
 	/* 滑动图标长图到目标位置 */
-	LB_OBJ_START_ANIM(icon_cont, y, tar_y, LV_OBJ_ANIM_EXEC_TIME);
+	LV_OBJ_START_ANIM(icon_cont, y, tar_y, LV_OBJ_ANIM_EXEC_TIME);
 }
 
 /**
@@ -242,7 +236,10 @@ static void page_main_menu_setup()
 static void page_main_menu_exit()
 {
 	/* 图标全部滑出 */
-	LB_OBJ_START_ANIM(icon_cont, y, update_layout_and_get_obj_height(icon_disp) + ICON_SIZE, LV_OBJ_ANIM_EXEC_TIME);
+	LV_OBJ_START_ANIM(icon_cont, y, update_layout_and_get_obj_height(icon_disp) + ICON_SIZE, LV_OBJ_ANIM_EXEC_TIME);
+
+	/* 图标索引清零 */
+	icon_idx_cur = 0;
 
 	lv_obj_clean(app_win);
 }
@@ -300,8 +297,7 @@ int main_menu_window_create()
 		return -1;
 
 	lv_obj_set_scrollbar_mode(app_win, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
-//	lv_obj_set_size(app_win, APP_WIN_WIDTH(lv_scr_act()), APP_WIN_HEIGHT(lv_scr_act()));
-	lv_obj_set_size(app_win, 135, 240);
+	lv_obj_set_size(app_win, APP_WIN_WIDTH(lv_scr_act()), APP_WIN_HEIGHT(lv_scr_act()));
 	lv_obj_center(app_win);
 
 	static lv_style_t style;

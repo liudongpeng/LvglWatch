@@ -24,7 +24,7 @@ lv_coord_t update_layout_and_get_obj_width(const lv_obj_t *obj)
 	if (obj == NULL)
 		return 0;
 
-	lv_obj_update_layout(obj);
+	lv_obj_update_layout(lv_scr_act());
 
 	return lv_obj_get_width(obj);
 }
@@ -39,7 +39,7 @@ lv_coord_t update_layout_and_get_obj_height(const lv_obj_t *obj)
 	if (obj == NULL)
 		return 0;
 
-	lv_obj_update_layout(obj);
+	lv_obj_update_layout(lv_scr_act());
 
 	return lv_obj_get_height(obj);
 }
@@ -54,7 +54,7 @@ lv_coord_t update_layout_and_get_obj_y(const lv_obj_t *obj)
 	if (obj == NULL)
 		return 0;
 
-	lv_obj_update_layout(obj);
+	lv_obj_update_layout(lv_scr_act());
 
 	return lv_obj_get_y(obj);
 }

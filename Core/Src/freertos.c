@@ -61,21 +61,21 @@ page_manager_t g_page_manager;    /* 界面管理器 */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
-		.name = "defaultTask",
-		.stack_size = 128 * 4,
-		.priority = (osPriority_t) osPriorityLow,
+  .name = "defaultTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for display_flush_task */
 osThreadId_t display_flush_taskHandle;
 const osThreadAttr_t display_flush_task_attributes = {
-		.name = "display_flush_task",
-		.stack_size = 500 * 4,
-		.priority = (osPriority_t) osPriorityNormal,
+  .name = "display_flush_task",
+  .stack_size = 500 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for usart1_mutex */
 osMutexId_t usart1_mutexHandle;
 const osMutexAttr_t usart1_mutex_attributes = {
-		.name = "usart1_mutex"
+  .name = "usart1_mutex"
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -91,7 +91,6 @@ void test()
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
-
 void start_display_flush_task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -101,9 +100,8 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
   * @param  None
   * @retval None
   */
-void MX_FREERTOS_Init(void)
-{
-	/* USER CODE BEGIN Init */
+void MX_FREERTOS_Init(void) {
+  /* USER CODE BEGIN Init */
 	int ret = 0;
 
 	printf("enter MX_FREERTOS_Init()\n");
@@ -163,41 +161,41 @@ void MX_FREERTOS_Init(void)
 	/* FIXME: hello world */
 
 
-	/* USER CODE END Init */
-	/* Create the mutex(es) */
-	/* creation of usart1_mutex */
-	usart1_mutexHandle = osMutexNew(&usart1_mutex_attributes);
+  /* USER CODE END Init */
+  /* Create the mutex(es) */
+  /* creation of usart1_mutex */
+  usart1_mutexHandle = osMutexNew(&usart1_mutex_attributes);
 
-	/* USER CODE BEGIN RTOS_MUTEX */
+  /* USER CODE BEGIN RTOS_MUTEX */
 	/* add mutexes, ... */
-	/* USER CODE END RTOS_MUTEX */
+  /* USER CODE END RTOS_MUTEX */
 
-	/* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
 	/* add semaphores, ... */
-	/* USER CODE END RTOS_SEMAPHORES */
+  /* USER CODE END RTOS_SEMAPHORES */
 
-	/* USER CODE BEGIN RTOS_TIMERS */
+  /* USER CODE BEGIN RTOS_TIMERS */
 	/* start timers, add new ones, ... */
-	/* USER CODE END RTOS_TIMERS */
+  /* USER CODE END RTOS_TIMERS */
 
-	/* USER CODE BEGIN RTOS_QUEUES */
+  /* USER CODE BEGIN RTOS_QUEUES */
 	/* add queues, ... */
-	/* USER CODE END RTOS_QUEUES */
+  /* USER CODE END RTOS_QUEUES */
 
-	/* Create the thread(s) */
-	/* creation of defaultTask */
-	defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  /* Create the thread(s) */
+  /* creation of defaultTask */
+  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
-	/* creation of display_flush_task */
-	display_flush_taskHandle = osThreadNew(start_display_flush_task, NULL, &display_flush_task_attributes);
+  /* creation of display_flush_task */
+  display_flush_taskHandle = osThreadNew(start_display_flush_task, NULL, &display_flush_task_attributes);
 
-	/* USER CODE BEGIN RTOS_THREADS */
+  /* USER CODE BEGIN RTOS_THREADS */
 	/* add threads, ... */
-	/* USER CODE END RTOS_THREADS */
+  /* USER CODE END RTOS_THREADS */
 
-	/* USER CODE BEGIN RTOS_EVENTS */
+  /* USER CODE BEGIN RTOS_EVENTS */
 	/* add events, ... */
-	/* USER CODE END RTOS_EVENTS */
+  /* USER CODE END RTOS_EVENTS */
 
 }
 
@@ -210,7 +208,7 @@ void MX_FREERTOS_Init(void)
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
 {
-	/* USER CODE BEGIN StartDefaultTask */
+  /* USER CODE BEGIN StartDefaultTask */
 	/* Infinite loop */
 	for (;;)
 	{
@@ -221,7 +219,7 @@ void StartDefaultTask(void *argument)
 
 		osDelay(1);
 	}
-	/* USER CODE END StartDefaultTask */
+  /* USER CODE END StartDefaultTask */
 }
 
 /* USER CODE BEGIN Header_start_display_flush_task */
@@ -233,7 +231,7 @@ void StartDefaultTask(void *argument)
 /* USER CODE END Header_start_display_flush_task */
 void start_display_flush_task(void *argument)
 {
-	/* USER CODE BEGIN start_display_flush_task */
+  /* USER CODE BEGIN start_display_flush_task */
 	/* Infinite loop */
 	for (;;)
 	{
@@ -241,7 +239,7 @@ void start_display_flush_task(void *argument)
 
 		osDelay(1);
 	}
-	/* USER CODE END start_display_flush_task */
+  /* USER CODE END start_display_flush_task */
 }
 
 /* Private application code --------------------------------------------------*/

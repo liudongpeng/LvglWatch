@@ -29,7 +29,7 @@ extern "C" {
 /**
  * @brief lvgl对象执行动画
  */
-#define LB_OBJ_START_ANIM(obj, attr, tar, time) \
+#define LV_OBJ_START_ANIM(obj, attr, tar, time) \
 do                                              \
 {                                               \
     static lv_anim_t anim;                      \

@@ -51,27 +51,19 @@ static lv_obj_t *labelTimeTest;
 
 
 static void page_dial_bg_create();
-
 static void page_dial_state_bar_create();
-
 static void page_dial_label_date_create();
-
 static void page_dial_label_time_create();
-
 static void page_dial_led_create();
 
 static void timer_task_state_bar_update(lv_timer_t *timer);
-
 static void timer_task_time_update(lv_timer_t *timer);
 
 static void date_update();
-
 static void time_update();
 
 static void page_dial_setup();
-
 static void page_dial_exit();
-
 static void page_dial_event_handle(void *obj, int event);
 
 
@@ -183,20 +175,10 @@ static void page_dial_label_time_create()
 		label_time_grp_bk[i] = label;
 	}
 
-//	memset(&rtc_time_last, 0, sizeof(rtc_time_last));
+	/* 清空上次记录的时间!!! */
+	memset(&rtc_time_last, 0, sizeof(rtc_time_last));
 	/* 创建时间更新任务 */
 	timer_time_update = lv_timer_create(timer_task_time_update, 500, NULL);
-
-//	/* ------ 测试 ------ */
-//	labelTimeTest = lv_label_create(app_win);
-//	lv_label_set_text(labelTimeTest, "");
-//	lv_obj_align(labelTimeTest, LV_ALIGN_BOTTOM_LEFT, 0, 0);
-//
-//	static lv_style_t styleTest;
-//	lv_style_init(&styleTest);
-//	lv_style_set_text_color(&styleTest, lv_color_white());
-//	lv_style_set_text_font(&styleTest, &lv_font_montserrat_14);
-//	lv_obj_add_style(labelTimeTest, &styleTest, 0);
 }
 
 /**
@@ -304,8 +286,8 @@ do  \
     lv_coord_t y_ofs = abs(update_layout_and_get_obj_y(label_now) - update_layout_and_get_obj_y(label_next));   \
     \
     /* 执行滑动动画 */    \
-    LB_OBJ_START_ANIM(label_now, y, update_layout_and_get_obj_y(label_now) + y_ofs, LV_OBJ_ANIM_EXEC_TIME); \
-    LB_OBJ_START_ANIM(label_next, y, update_layout_and_get_obj_y(label_next) + y_ofs, LV_OBJ_ANIM_EXEC_TIME);   \
+    LV_OBJ_START_ANIM(label_now, y, update_layout_and_get_obj_y(label_now) + y_ofs, LV_OBJ_ANIM_EXEC_TIME); \
+    LV_OBJ_START_ANIM(label_next, y, update_layout_and_get_obj_y(label_next) + y_ofs, LV_OBJ_ANIM_EXEC_TIME);   \
     }                                                               \
     \
 } while (0);

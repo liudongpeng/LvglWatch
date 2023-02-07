@@ -14,8 +14,10 @@
 
 #define LV_HOR_RES_MAX  135
 #define LV_VER_RES_MAX  240
-#define DISP_BUF_SIZE   (LV_HOR_RES_MAX * 30)
+#define DISP_BUF_SIZE   (LV_HOR_RES_MAX * 60)
 
+
+static uint8_t buf[DISP_BUF_SIZE * 2];
 
 static lv_color_t lv_disp_buf1[DISP_BUF_SIZE];
 static lv_color_t lv_disp_buf2[DISP_BUF_SIZE];
@@ -36,7 +38,7 @@ static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_
  */
 static void disp_spi_dma_send(void *buf, uint32_t size)
 {
-	HAL_SPI_Transmit_DMA(&SCREEN_SPI_HANDLER, (uint8_t *) buf, size);
+	HAL_SPI_Transmit_DMA(&SCREEN_SPI_HANDLER, (uint8_t *)buf, size);
 }
 
 
@@ -80,28 +82,30 @@ void endian_exchange_u16(uint16_t *a)
  *'lv_disp_flush_ready()' has to be called when finished.*/
 static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)
 {
-	int w = area->x2 - area->x1 + 1;
-	int h = area->y2 - area->y1 + 1;
-	uint32_t data_size = w * h * sizeof(lv_color_t);
+//	int w = area->x2 - area->x1 + 1;
+//	int h = area->y2 - area->y1 + 1;
+//	uint32_t data_size = w * h * sizeof(lv_color_t);
 
-	uint16_t *data = pvPortMalloc(data_size);
-	if (data == NULL)
-	{
-		printf("¿Õ¼ä¿ª±ÙÊ§°Ü, Ë¢ÆÁÊ§°Ü\n");
-		return;
-	}
-	memcpy(data, color_p, data_size);
+//	uint16_t *data = pvPortMalloc(data_size);
+//	if (data == NULL)
+//	{
+//		printf("¿Õ¼ä¿ª±ÙÊ§°Ü, Ë¢ÆÁÊ§°Ü\n");
+//		return;
+//	}
 
-	uint32_t count = data_size / 2;
-	for (uint32_t i = 0; i < count; i++)
-		endian_exchange_u16(data + i);
-
-	/* ÉèÖÃÏÔÊ¾ÇøÓò */
-	lcd_set_window_area(&g_lcd, area->x1, area->y1, w, h);
-	/* DMA·¢ËÍÇëÇó */
-	g_lcd.drv->set_dc_level(1);
-	disp_spi_dma_send(data, data_size);
-	vPortFree(data);
+//	memcpy(buf, color_p, data_size);
+//
+//	uint32_t count = data_size / 2;
+//	for (uint32_t i = 0; i < count; i++)
+//		endian_exchange_u16(buf + i);
+//
+//	/* ÉèÖÃÏÔÊ¾ÇøÓò */
+//	lcd_set_window_area(&g_lcd, area->x1, area->y1, w, h);
+//	/* DMA·¢ËÍÇëÇó */
+//	g_lcd.drv->set_dc_level(1);
+//	disp_spi_dma_send(buf, data_size);
+////	vPortFree(data);
+//	lv_disp_flush_ready(disp_drv);
 
 
 //	int32_t x, y;
@@ -112,21 +116,19 @@ static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_
 //		}
 //	}
 
-//	int w = area->x2 - area->x1 + 1;
-//	int h = area->y2 - area->y1 + 1;
-//	uint32_t data_size = w * h * sizeof(lv_color_t);
-//
-//	uint16_t* data = pvPortMalloc(data_size);
-//	memcpy(data, color_p, data_size);
-//
-//	uint32_t count = data_size / 2;
-//	for (uint32_t i = 0; i < count; i++)
-//		endian_exchange_u16(data + i);
-//
-//	lcd_draw_area(&g_lcd, area->x1, area->y1, w, h, (uint8_t*)data);
-//	vPortFree(data);
-//
-//	lv_disp_flush_ready(disp_drv);
+	int w = area->x2 - area->x1 + 1;
+	int h = area->y2 - area->y1 + 1;
+	uint32_t data_size = w * h * sizeof(lv_color_t);
+
+
+	memcpy(buf, color_p, data_size);
+
+	uint32_t count = data_size / 2;
+	for (uint32_t i = 0; i < count; i++)
+		endian_exchange_u16((uint16_t*)buf + i);
+
+	lcd_draw_area(&g_lcd, area->x1, area->y1, w, h, (uint8_t*)buf);
+	lv_disp_flush_ready(disp_drv);
 
 
 	/*IMPORTANT!!!

@@ -29,8 +29,8 @@ enum user_page_id
 	Page_BackLight, /* 亮度 */
 	Page_StopWatch, /* 停表 */
 	Page_Altitude,  /* 海拔高度 */
-//	Page_Theme,     /* 主题 */
 	Page_About,     /* 关于 */
+	Page_Theme,     /* 主题 */
 
 	Page_Max,       /* 保留 */
 };

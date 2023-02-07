@@ -68,7 +68,7 @@ uint32_t btn_get_tick()
  */
 int screen_spi_write(uint8_t *data, uint16_t len)
 {
-	return HAL_SPI_Transmit(&SCREEN_SPI_HANDLER, data, len, 1000);
+	return HAL_SPI_Transmit(&SCREEN_SPI_HANDLER, data, len, 100);
 }
 
 /**

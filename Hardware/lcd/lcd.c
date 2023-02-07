@@ -235,10 +235,10 @@ int lcd_set_window_area(lcd_t *lcd, int x, int y, int width, int height)
 	/* 设置行起始地址和结束地址 */
 	cmd = ST7789_CMD_RASET;
 	lcd_write_cmd(lcd, &cmd, 1);
-	y += 39;
+//	y += 40;
 	cmd_list[0] = y >> 8;
 	cmd_list[1] = y;
-	y1 += 39;
+//	y1 += 40;
 	cmd_list[2] = y1 >> 8;
 	cmd_list[3] = y1;
 	lcd_write_data(lcd, cmd_list, 4);
