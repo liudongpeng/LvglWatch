@@ -12,15 +12,15 @@
 /**
  * @brief 声明图标资源
  */
-LV_IMG_DECLARE(icon_info)
-LV_IMG_DECLARE(icon_light)
-LV_IMG_DECLARE(icon_mountain)
-LV_IMG_DECLARE(icon_stop_watch)
-LV_IMG_DECLARE(icon_theme)
-LV_IMG_DECLARE(icon_time_cfg)
+LV_IMG_DECLARE(icon_stopwatch_64x64)
+LV_IMG_DECLARE(icon_mountain_64x64)
+LV_IMG_DECLARE(icon_brightness_64x64)
+LV_IMG_DECLARE(icon_setting_64x64)
+LV_IMG_DECLARE(icon_theme_64x64)
+LV_IMG_DECLARE(icon_about_64x64)
+
 
 extern page_manager_t g_page_manager;    /* 界面管理器, 在freertos.c文件中定义 */
-
 page_t page_main_menu;    /* "主菜单"界面, 以此来进行界面管理 */
 
 static lv_obj_t *app_win;      /* "主菜单"界面窗口, 用于绘制其他控件 */
@@ -45,21 +45,19 @@ typedef struct icon
 
 /* 图标集合, 保存所有图标对象 */
 static icon_t icon_grp[] = {
-	{.icon_data = &icon_stop_watch, .icon_name = "StopWatch",   .page_id = Page_StopWatch}, /* 停表 */
-	{.icon_data = &icon_mountain,   .icon_name = "Altitude",    .page_id = Page_Altitude},  /* 海拔高度 */
-	{.icon_data = &icon_light,      .icon_name = "BackLight",   .page_id = Page_BackLight}, /* 亮度 */
-	{.icon_data = &icon_time_cfg,   .icon_name = "TimeCfg",     .page_id = Page_TimeCfg},   /* 时间设置 */
-	{.icon_data = &icon_theme,      .icon_name = "Theme",       .page_id = Page_Theme},     /* 时间设置 */
-	{.icon_data = &icon_info,       .icon_name = "About",       .page_id = Page_About},     /* 关于 */
+		{.icon_data = &icon_stopwatch_64x64, .icon_name = "StopWatch", .page_id = Page_StopWatch},  /* 停表 */
+		{.icon_data = &icon_mountain_64x64, .icon_name = "Altitude", .page_id = Page_Altitude}, /* 海拔高度 */
+		{.icon_data = &icon_brightness_64x64, .icon_name = "BackLight", .page_id = Page_BackLight}, /* 亮度 */
+		{.icon_data = &icon_setting_64x64, .icon_name = "TimeCfg", .page_id = Page_TimeCfg},    /* 时间设置 */
+		{.icon_data = &icon_theme_64x64, .icon_name = "Theme", .page_id = Page_Theme},  /* 时间设置 */
+		{.icon_data = &icon_about_64x64, .icon_name = "About", .page_id = Page_About},  /* 关于 */
 };
 
 
 #define ICON_INTERVAL   20  /* 图标间隔 */
-#define ICON_SIZE       50  /* 图标大小 */
+#define ICON_SIZE       64  /* 图标大小 */
 #define ICON_COUNT      (sizeof(icon_grp) / sizeof(icon_t))
 #define ICON_INDEX_MAX  (ICON_COUNT - 1)
-
-
 
 
 static void page_main_menu_icon_grp_create();
@@ -113,49 +111,50 @@ static void page_main_menu_title_create()
 static void page_main_menu_icon_grp_create()
 {
 	/* 创建图标显示窗口 */
-    icon_disp = lv_obj_create(app_win);
-    lv_obj_set_size(icon_disp, ICON_SIZE + 20,
-					APP_WIN_HEIGHT(app_win) - update_layout_and_get_obj_y(line_title) - 20);
-    lv_obj_set_scrollbar_mode(icon_disp, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
-    lv_obj_set_style_bg_opa(icon_disp, LV_OPA_TRANSP, 0);   /* 设置背景透明 */
+	icon_disp = lv_obj_create(app_win);
+	lv_obj_set_size(icon_disp, ICON_SIZE + 20,
+	                APP_WIN_HEIGHT(app_win) - update_layout_and_get_obj_y(line_title) - 20);
+	lv_obj_set_scrollbar_mode(icon_disp, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
+	lv_obj_set_style_bg_opa(icon_disp, LV_OPA_TRANSP, 0);   /* 设置背景透明 */
 	lv_obj_align_to(icon_disp, line_title, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
 
-    static lv_style_t style_icon_disp;
-    lv_style_init(&style_icon_disp);
+	static lv_style_t style_icon_disp;
+	lv_style_init(&style_icon_disp);
 	lv_style_set_pad_all(&style_icon_disp, 0);      /* 设置此窗口上下左右全部padding大小为0 */
-    lv_style_set_radius(&style_icon_disp, 0);       /* 设置边框弧度 */
-    lv_style_set_border_side(&style_icon_disp, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
-    lv_obj_add_style(icon_disp, &style_icon_disp, 0);
+	lv_style_set_radius(&style_icon_disp, 0);       /* 设置边框弧度 */
+	lv_style_set_border_width(&style_icon_disp, 0); /* 设置边框宽度为0 */
+	lv_style_set_border_side(&style_icon_disp, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
+	lv_obj_add_style(icon_disp, &style_icon_disp, 0);
 
 
-    /* 把图片竖向拼接起来, 图片可以在屏幕上下滑动 */
-    icon_cont = lv_obj_create(icon_disp);
-    lv_obj_set_style_bg_opa(icon_cont, LV_OPA_TRANSP, 0);   /* 设置对象背景透明 */
-    lv_obj_set_scrollbar_mode(icon_cont, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
-    lv_obj_set_size(icon_cont, update_layout_and_get_obj_width(icon_disp), (ICON_SIZE + ICON_INTERVAL) * ICON_COUNT);
-	lv_obj_center(icon_cont);
-    lv_obj_set_y(icon_cont, update_layout_and_get_obj_height(icon_disp));
+	/* 把图片竖向拼接起来, 图片可以在屏幕上下滑动 */
+	icon_cont = lv_obj_create(icon_disp);
+	lv_obj_set_style_bg_opa(icon_cont, LV_OPA_TRANSP, 0);   /* 设置对象背景透明 */
+	lv_obj_set_scrollbar_mode(icon_cont, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
+	lv_obj_set_size(icon_cont, update_layout_and_get_obj_width(icon_disp),
+					(ICON_SIZE + ICON_INTERVAL) * ICON_COUNT - ICON_INTERVAL);
+	lv_obj_align_to(icon_cont, icon_disp, LV_ALIGN_TOP_MID, 0, 0);
 
-    static lv_style_t style_icon_cont;
-    lv_style_init(&style_icon_cont);
+	static lv_style_t style_icon_cont;
+	lv_style_init(&style_icon_cont);
 	lv_style_set_pad_all(&style_icon_cont, 0);    /* 设置此窗口上下左右全部padding大小为0 */
-    lv_style_set_border_color(&style_icon_cont, lv_color_make(0xff, 0, 0));
-    lv_style_set_radius(&style_icon_cont, 0); /* 设置边框弧度 */
-    lv_style_set_border_side(&style_icon_cont, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
-    lv_obj_add_style(icon_cont, &style_icon_cont, 0);
+	lv_style_set_border_color(&style_icon_cont, lv_color_make(0xff, 0, 0));
+	lv_style_set_radius(&style_icon_cont, 0); /* 设置边框弧度 */
+	lv_style_set_border_width(&style_icon_cont, 0); /* 设置边框宽度为0 */
+	lv_style_set_border_side(&style_icon_cont, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
+	lv_obj_add_style(icon_cont, &style_icon_cont, 0);
 
-    for (int i = 0; i < ICON_COUNT; i++)
-    {
-        lv_obj_t* icon = lv_img_create(icon_cont);
-        lv_img_set_src(icon, icon_grp[i].icon_data);
-        lv_obj_align(icon, LV_ALIGN_TOP_MID, 0, 0);
+	for (int i = 0; i < ICON_COUNT; i++)
+	{
+		lv_obj_t *icon = lv_img_create(icon_cont);
+		lv_img_set_src(icon, icon_grp[i].icon_data);
+		lv_obj_align(icon, LV_ALIGN_TOP_MID, 0, 0);
 
-        /* 计算每个图标的偏移量, 把所有图标从上到下依次摆放 */
-        int ofs_y = (ICON_SIZE - update_layout_and_get_obj_height(icon)) / 2;
-        lv_obj_set_y(icon, ((ICON_SIZE + ICON_INTERVAL) * i) + 0);
+		/* 计算每个图标的偏移量, 把所有图标从上到下依次摆放 */
+		lv_obj_set_y(icon, (ICON_SIZE + ICON_INTERVAL) * i);
 
-	    icon_grp[i].img_icon = icon;
-    }
+		icon_grp[i].img_icon = icon;
+	}
 }
 
 /**
@@ -190,7 +189,7 @@ static void page_main_menu_icon_grp_move_focus(uint8_t idx)
 	lv_label_set_text_static(label_title, icon_grp[idx].icon_name);
 
 	/* 计算目标y位置 */
-	int tar_y = -(ICON_SIZE + ICON_INTERVAL) * (idx - 1);
+	int tar_y = -(ICON_SIZE + ICON_INTERVAL) * (idx - 1) - ICON_INTERVAL;
 
 	/* 滑动图标长图到目标位置 */
 	LV_OBJ_START_ANIM(icon_cont, y, tar_y, LV_OBJ_ANIM_EXEC_TIME);
@@ -238,10 +237,10 @@ static void page_main_menu_exit()
 	/* 图标全部滑出 */
 	LV_OBJ_START_ANIM(icon_cont, y, update_layout_and_get_obj_height(icon_disp) + ICON_SIZE, LV_OBJ_ANIM_EXEC_TIME);
 
+	lv_obj_clean(app_win);
+
 	/* 图标索引清零 */
 	icon_idx_cur = 0;
-
-	lv_obj_clean(app_win);
 }
 
 /**
@@ -265,7 +264,6 @@ static void page_main_menu_event_handle(void *btn, int event)
 			case ButtonEvent_SingleClick:
 				/* 单击确认按钮, 进入选中的页面 */
 				id = icon_grp[icon_idx_cur].page_id;
-				printf("in page_main_menu_event_handle(), cur_icon_idx = %d\n", icon_idx_cur);
 				if (g_page_manager.page_list[id].page_setup != NULL)
 					page_push(&g_page_manager, id);
 				break;
@@ -319,7 +317,7 @@ int page_main_menu_register()
 {
 	/* 创建新界面, 并注册到界面管理器 */
 	if (page_register(&g_page_manager, Page_MainMenu, page_main_menu_setup, NULL,
-				  page_main_menu_exit, page_main_menu_event_handle) < 0)
+	                  page_main_menu_exit, page_main_menu_event_handle) < 0)
 	{
 		printf("page_main_menu_register() failed\n");
 

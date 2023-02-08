@@ -6,7 +6,6 @@
 #include "bsp_led.h"
 #include <stdio.h>
 
-
 extern page_manager_t g_page_manager;	/* 界面管理器, 在freertos.c文件中定义 */
 
 
@@ -63,5 +62,5 @@ static void button_event_handler(void* btn, int event)
 	flag = !flag;
 	flag ? led_open(&g_user_led) : led_close(&g_user_led);
 
-	printf("leave button_event_handler()\n\n");
+	printf("btn event -> %d\n", event);
 }

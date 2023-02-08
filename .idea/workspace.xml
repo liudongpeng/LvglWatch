@@ -63,12 +63,12 @@
   }
 }</component>
   <component name="RunManager" selected="OpenOCD Download &amp; Run.LvglWatch.elf">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+    <configuration name="LvglWatch.elf" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="LvglWatch" TARGET_NAME="LvglWatch.elf" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="LvglWatch" RUN_TARGET_NAME="LvglWatch.elf">
       <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="LvglWatch.elf" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="LvglWatch" TARGET_NAME="LvglWatch.elf" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="LvglWatch" RUN_TARGET_NAME="LvglWatch.elf">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -114,6 +114,7 @@
       <workItem from="1675612406087" duration="409000" />
       <workItem from="1675645767757" duration="36320000" />
       <workItem from="1675770710839" duration="9406000" />
+      <workItem from="1675858886016" duration="7008000" />
     </task>
     <servers />
   </component>

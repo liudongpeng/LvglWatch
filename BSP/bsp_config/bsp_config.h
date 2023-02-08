@@ -28,8 +28,8 @@ void user_led_set_level(uint8_t level);
 
 
 /* ------------------------------ button ------------------------------ */
-#define BTN_SCAN_TIM TIM2            /* 按键扫描定时器 */
-#define BTN_SCAN_TIM_HANDLER htim2   /* 按键扫描定时器句柄 */
+#define BTN_SCAN_TIM TIM4            /* 按键扫描定时器 */
+#define BTN_SCAN_TIM_HANDLER htim4   /* 按键扫描定时器句柄 */
 
 uint8_t btn_left_get_level();
 uint8_t btn_right_get_level();

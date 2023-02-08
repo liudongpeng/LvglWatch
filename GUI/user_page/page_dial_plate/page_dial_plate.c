@@ -153,7 +153,6 @@ static void page_dial_label_time_create()
 	lv_style_set_text_color(&style_label_time, lv_color_white());
 	lv_style_set_text_font(&style_label_time, &Morganite_100);
 
-//	time_update();
 	const static lv_coord_t x_pos[4] = {-45, -20, 20, 45};
 	for (int i = 0; i < sizeof(label_time_grp) / sizeof(label_time_grp[0]); i++)
 	{
@@ -179,6 +178,7 @@ static void page_dial_label_time_create()
 	memset(&rtc_time_last, 0, sizeof(rtc_time_last));
 	/* 创建时间更新任务 */
 	timer_time_update = lv_timer_create(timer_task_time_update, 500, NULL);
+	time_update();
 }
 
 /**
@@ -248,7 +248,7 @@ static void date_update()
 	lv_label_set_text_fmt(label_date, "%02d#FF0000 /#%02d %s", rtc_data.Month, rtc_data.Date, week[idx]);
 
 	/* 日期备份 */
-	bsp_rtc_date_backup();
+//	bsp_rtc_date_backup();
 };
 
 /**
@@ -331,6 +331,8 @@ static void page_dial_setup()
 	page_dial_label_time_create();
 	page_dial_led_create();
 
+
+	printf("leave page_dial_setup()\n");
 }
 
 /**

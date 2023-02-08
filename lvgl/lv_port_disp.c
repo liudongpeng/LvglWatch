@@ -22,7 +22,7 @@ static uint8_t buf[DISP_BUF_SIZE * 2];
 static lv_color_t lv_disp_buf1[DISP_BUF_SIZE];
 static lv_color_t lv_disp_buf2[DISP_BUF_SIZE];
 static lv_disp_draw_buf_t draw_buf;
-static lv_disp_drv_t disp_drv;  /*Descriptor of a display driver*/
+lv_disp_drv_t disp_drv;  /*Descriptor of a display driver*/
 
 
 
@@ -82,30 +82,20 @@ void endian_exchange_u16(uint16_t *a)
  *'lv_disp_flush_ready()' has to be called when finished.*/
 static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)
 {
-//	int w = area->x2 - area->x1 + 1;
-//	int h = area->y2 - area->y1 + 1;
-//	uint32_t data_size = w * h * sizeof(lv_color_t);
+	int w = area->x2 - area->x1 + 1;
+	int h = area->y2 - area->y1 + 1;
+	uint32_t data_size = w * h * sizeof(lv_color_t);
 
-//	uint16_t *data = pvPortMalloc(data_size);
-//	if (data == NULL)
-//	{
-//		printf("空间开辟失败, 刷屏失败\n");
-//		return;
-//	}
+	memcpy(buf, color_p, data_size);
+	uint32_t count = data_size / 2;
+	for (uint32_t i = 0; i < count; i++)
+		endian_exchange_u16((uint16_t*)buf + i);
 
-//	memcpy(buf, color_p, data_size);
-//
-//	uint32_t count = data_size / 2;
-//	for (uint32_t i = 0; i < count; i++)
-//		endian_exchange_u16(buf + i);
-//
-//	/* 设置显示区域 */
-//	lcd_set_window_area(&g_lcd, area->x1, area->y1, w, h);
-//	/* DMA发送请求 */
-//	g_lcd.drv->set_dc_level(1);
-//	disp_spi_dma_send(buf, data_size);
-////	vPortFree(data);
-//	lv_disp_flush_ready(disp_drv);
+	/* 设置显示区域 */
+	lcd_set_window_area(&g_lcd, area->x1, area->y1, w, h);
+	/* DMA发送请求 */
+	g_lcd.drv->set_dc_level(1);
+	disp_spi_dma_send(buf, data_size);
 
 
 //	int32_t x, y;
@@ -116,19 +106,17 @@ static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_
 //		}
 //	}
 
-	int w = area->x2 - area->x1 + 1;
-	int h = area->y2 - area->y1 + 1;
-	uint32_t data_size = w * h * sizeof(lv_color_t);
-
-
-	memcpy(buf, color_p, data_size);
-
-	uint32_t count = data_size / 2;
-	for (uint32_t i = 0; i < count; i++)
-		endian_exchange_u16((uint16_t*)buf + i);
-
-	lcd_draw_area(&g_lcd, area->x1, area->y1, w, h, (uint8_t*)buf);
-	lv_disp_flush_ready(disp_drv);
+//	int w = area->x2 - area->x1 + 1;
+//	int h = area->y2 - area->y1 + 1;
+//	uint32_t data_size = w * h * sizeof(lv_color_t);
+//
+//	memcpy(buf, color_p, data_size);
+//	uint32_t count = data_size / 2;
+//	for (uint32_t i = 0; i < count; i++)
+//		endian_exchange_u16((uint16_t*)buf + i);
+//
+//	lcd_draw_area(&g_lcd, area->x1, area->y1, w, h, (uint8_t*)buf);
+//	lv_disp_flush_ready(disp_drv);
 
 
 	/*IMPORTANT!!!
@@ -137,28 +125,17 @@ static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_
 }
 
 
-///**
-//  * @brief  Tx Transfer completed callback.
-//  * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
-//  *               the configuration information for SPI module.
-//  * @retval None
-//  */
-//void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
-//{
-//	if (hspi->Instance == SCREEN_SPI)
-//	{
-//		/* tell lvgl that flushing is done */
-//		lv_disp_flush_ready(&disp_drv);
-//		g_lcd.drv->set_cs_level(1);
-//
-//	}
-//}
-
 /**
- * @brief DMA传输完成回调
- * @param _hdma
- */
-void lvgl_flush_cb(DMA_HandleTypeDef *_hdma)
+  * @brief  Tx Transfer completed callback.
+  * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
+  *               the configuration information for SPI module.
+  * @retval None
+  */
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-	lv_disp_flush_ready(&disp_drv);
+	if (hspi->Instance == SCREEN_SPI)
+	{
+		/* tell lvgl that flushing is done */
+		lv_disp_flush_ready(&disp_drv);
+	}
 }
