@@ -94,8 +94,10 @@ static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_
 	/* 设置显示区域 */
 	lcd_set_window_area(&g_lcd, area->x1, area->y1, w, h);
 	/* DMA发送请求 */
+	g_lcd.drv->set_cs_level(0);
 	g_lcd.drv->set_dc_level(1);
 	disp_spi_dma_send(buf, data_size);
+
 
 
 //	int32_t x, y;
@@ -137,5 +139,6 @@ void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 	{
 		/* tell lvgl that flushing is done */
 		lv_disp_flush_ready(&disp_drv);
+		g_lcd.drv->set_cs_level(1);
 	}
 }

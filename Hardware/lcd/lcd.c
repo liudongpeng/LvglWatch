@@ -29,6 +29,7 @@ static int lcd_write_cmd(lcd_t* lcd, uint8_t* cmd_list, uint16_t len);
 static int lcd_write_data(lcd_t* lcd, uint8_t* data_list, uint16_t len);
 
 
+
 /**
  * @brief 创建lcd对象
  * @param[out]	lcd

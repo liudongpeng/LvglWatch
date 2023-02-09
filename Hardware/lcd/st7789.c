@@ -17,8 +17,8 @@
 #define LCD_DC_SET()    st->set_dc_level ? st->set_dc_level(1) : NULL
 #define LCD_DC_RESET()  st->set_dc_level ? st->set_dc_level(0) : NULL
 
-#define LCD_CS_SET()    /*st->set_cs_level ? st->set_cs_level(1) : NULL*/0
-#define LCD_CS_RESET()  /*st->set_cs_level ? st->set_cs_level(0) : NULL*/0
+#define LCD_CS_SET()    st->set_cs_level ? st->set_cs_level(1) : NULL
+#define LCD_CS_RESET()  st->set_cs_level ? st->set_cs_level(0) : NULL
 
 
 /**

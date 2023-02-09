@@ -71,9 +71,12 @@ include_directories(
 
         GUI/
         GUI/font_src
+        GUI/image_src
+
+        GUI/lvgl_obj_util
+        GUI/lvgl_img_list
+
         GUI/user_page
-        GUI/user_page/image_src
-        GUI/user_page/lvgl_obj_util
         GUI/user_page/page_about
         GUI/user_page/page_dial_plate
         GUI/user_page/page_main_menu
@@ -105,9 +108,12 @@ file(GLOB_RECURSE SOURCES "Core/*.*" "Middlewares/*.*" "Drivers/*.*"
 
         "GUI/*.*"
         "GUI/font_src/*.*"
+        "GUI/image_src/*.*"
+
+        "GUI/lvgl_obj_util/*.*"
+        "GUI/lvgl_img_list/*.*"
+
         "GUI/user_page/*.*"
-        "GUI/user_page/image_src/*.*"
-        "GUI/user_page/lvgl_obj_util/*.*"
         "GUI/user_page/page_about/*.*"
         "GUI/user_page/page_dial_plate/*.*"
         "GUI/user_page/page_main_menu/*.*"

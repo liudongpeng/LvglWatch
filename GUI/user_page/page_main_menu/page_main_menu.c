@@ -5,6 +5,7 @@
 #include "page_main_menu.h"
 #include "bsp.h"
 #include "lvgl_obj_util.h"
+#include "lvgl_img_list.h"
 #include "user_page_private.h"
 #include <stdio.h>
 
@@ -12,12 +13,19 @@
 /**
  * @brief 声明图标资源
  */
-LV_IMG_DECLARE(icon_stopwatch_64x64)
-LV_IMG_DECLARE(icon_mountain_64x64)
-LV_IMG_DECLARE(icon_brightness_64x64)
-LV_IMG_DECLARE(icon_setting_64x64)
-LV_IMG_DECLARE(icon_theme_64x64)
-LV_IMG_DECLARE(icon_about_64x64)
+LV_IMG_DECLARE(icon_stopwatch_white_64x64)
+LV_IMG_DECLARE(icon_mountain_white_64x64)
+LV_IMG_DECLARE(icon_brightness_white_64x64)
+LV_IMG_DECLARE(icon_setting_white_64x64)
+LV_IMG_DECLARE(icon_butterfly_white_64x64)
+LV_IMG_DECLARE(icon_about_white_64x64)
+
+LV_IMG_DECLARE(icon_stopwatch_red_64x64)
+LV_IMG_DECLARE(icon_mountain_red_64x64)
+LV_IMG_DECLARE(icon_brightness_red_64x64)
+LV_IMG_DECLARE(icon_setting_red_64x64)
+LV_IMG_DECLARE(icon_butterfly_red_64x64)
+LV_IMG_DECLARE(icon_about_red_64x64)
 
 
 extern page_manager_t g_page_manager;    /* 界面管理器, 在freertos.c文件中定义 */
@@ -29,30 +37,39 @@ static lv_obj_t *line_title;   /* 标题分割线 */
 static lv_obj_t *icon_disp;    /* img控件, 用于显示图标 */
 static lv_obj_t *icon_cont;    /* 图标容器 */
 
-static volatile uint8_t icon_idx_cur;   /* 当前图标索引 */
+static uint8_t icon_idx_cur;   /* 当前图标索引 */
 
 
 /**
  * @brief 图标对象信息定义
  */
-typedef struct icon
+typedef struct icon_info
 {
-	const void *icon_data;  /* 图标数据 */
-	const char *icon_name;  /* 图标描述 */
-	lv_obj_t *img_icon;     /* img控件, 用来显示图标 */
+	const void *icon_data_normal;  /* 正常图标数据 */
+	const void *icon_data_select;  /* 选中图标数据 */
+
+	const char *icon_name;  /* 图标名称 */
+
+	lvgl_img_win_t *icon;   /* 图标窗口 */
+
 	uint8_t page_id;        /* 界面id */
 } icon_t;
 
 /* 图标集合, 保存所有图标对象 */
 static icon_t icon_grp[] = {
-		{.icon_data = &icon_stopwatch_64x64, .icon_name = "StopWatch", .page_id = Page_StopWatch},  /* 停表 */
-		{.icon_data = &icon_mountain_64x64, .icon_name = "Altitude", .page_id = Page_Altitude}, /* 海拔高度 */
-		{.icon_data = &icon_brightness_64x64, .icon_name = "BackLight", .page_id = Page_BackLight}, /* 亮度 */
-		{.icon_data = &icon_setting_64x64, .icon_name = "TimeCfg", .page_id = Page_TimeCfg},    /* 时间设置 */
-		{.icon_data = &icon_theme_64x64, .icon_name = "Theme", .page_id = Page_Theme},  /* 时间设置 */
-		{.icon_data = &icon_about_64x64, .icon_name = "About", .page_id = Page_About},  /* 关于 */
+	{.icon_data_normal = &icon_stopwatch_white_64x64, .icon_data_select = &icon_stopwatch_red_64x64,
+		.icon_name = "StopWatch", .page_id = Page_StopWatch},   /* 停表 */
+	{.icon_data_normal = &icon_mountain_white_64x64, .icon_data_select = &icon_mountain_red_64x64,
+		.icon_name = "Altitude", .page_id = Page_Altitude}, /* 海拔高度 */
+	{.icon_data_normal = &icon_brightness_white_64x64, .icon_data_select = &icon_brightness_red_64x64,
+		.icon_name = "BackLight", .page_id = Page_BackLight},   /* 亮度 */
+	{.icon_data_normal = &icon_setting_white_64x64, .icon_data_select = &icon_setting_red_64x64,
+		.icon_name = "TimeConfig", .page_id = Page_TimeCfg},   /* 时间设置 */
+	{.icon_data_normal = &icon_butterfly_white_64x64, .icon_data_select = &icon_butterfly_red_64x64,
+		.icon_name = "Theme", .page_id = Page_Theme},   /* 时间设置 */
+	{.icon_data_normal = &icon_about_white_64x64, .icon_data_select = &icon_about_red_64x64,
+		.icon_name = "About", .page_id = Page_About},   /* 关于 */
 };
-
 
 #define ICON_INTERVAL   20  /* 图标间隔 */
 #define ICON_SIZE       64  /* 图标大小 */
@@ -132,7 +149,7 @@ static void page_main_menu_icon_grp_create()
 	lv_obj_set_style_bg_opa(icon_cont, LV_OPA_TRANSP, 0);   /* 设置对象背景透明 */
 	lv_obj_set_scrollbar_mode(icon_cont, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
 	lv_obj_set_size(icon_cont, update_layout_and_get_obj_width(icon_disp),
-					(ICON_SIZE + ICON_INTERVAL) * ICON_COUNT - ICON_INTERVAL);
+	                (ICON_SIZE + ICON_INTERVAL) * ICON_COUNT - ICON_INTERVAL);
 	lv_obj_align_to(icon_cont, icon_disp, LV_ALIGN_TOP_MID, 0, 0);
 
 	static lv_style_t style_icon_cont;
@@ -144,16 +161,34 @@ static void page_main_menu_icon_grp_create()
 	lv_style_set_border_side(&style_icon_cont, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
 	lv_obj_add_style(icon_cont, &style_icon_cont, 0);
 
+	/* 在icon_cont上依次创建每个图标窗口, 每个窗口中有两个图标, 分为白色和红色两个样式 */
 	for (int i = 0; i < ICON_COUNT; i++)
 	{
-		lv_obj_t *icon = lv_img_create(icon_cont);
-		lv_img_set_src(icon, icon_grp[i].icon_data);
-		lv_obj_align(icon, LV_ALIGN_TOP_MID, 0, 0);
+		lvgl_img_win_t* img_wim = lvgl_img_win_create(icon_cont, ICON_SIZE, ICON_SIZE);
+		lv_obj_align(lvgl_img_win_get_win(img_wim), LV_ALIGN_TOP_MID, 0, 0);
 
-		/* 计算每个图标的偏移量, 把所有图标从上到下依次摆放 */
-		lv_obj_set_y(icon, (ICON_SIZE + ICON_INTERVAL) * i);
+		lv_obj_t* icon_normal = lv_img_create(lvgl_img_win_get_win(img_wim));
+		lv_img_set_src(icon_normal, icon_grp[i].icon_data_normal);
+		lv_obj_align(icon_normal, LV_ALIGN_TOP_MID, 0, 0);
+		lvgl_img_list_insert(lvgl_img_win_get_list(img_wim), icon_normal, "normal");
 
-		icon_grp[i].img_icon = icon;
+		lv_obj_t* icon_select = lv_img_create(lvgl_img_win_get_win(img_wim));
+		lv_img_set_src(icon_select, icon_grp[i].icon_data_select);
+		lv_obj_align(icon_select, LV_ALIGN_TOP_MID, 0, 0);
+		lvgl_img_list_insert(lvgl_img_win_get_list(img_wim), icon_select, "select");
+
+		/* 把normal图标移到前台 */
+		lv_obj_move_foreground(lvgl_img_get_obj(lvgl_img_find(lvgl_img_win_get_list(img_wim), "normal")));
+		printf("in page_main_menu_icon_grp_create(), img_wim: %p, img_wim->img_list: %p, lvgl_img_win_get_list(img_wim): %p\n",
+		       img_wim, img_wim->img_list, lvgl_img_win_get_list(img_wim));
+
+		printf("in page_main_menu_icon_grp_create(), img_wim: %p, lvgl_img_win_get_win(img_wim): %p\n", img_wim,
+		       lvgl_img_win_get_win(img_wim));
+
+		/* 设置每个图标显示窗口的位置 */
+		lv_obj_set_y(lvgl_img_win_get_win(img_wim), (ICON_SIZE + ICON_INTERVAL) * i);
+
+		icon_grp[i].icon = img_wim;
 	}
 }
 
@@ -180,19 +215,30 @@ static void page_main_menu_img_shadow_create()
  */
 static void page_main_menu_icon_grp_move_focus(uint8_t idx)
 {
+	static uint8_t last_idx;
+
 	if (idx > ICON_INDEX_MAX)
-	{
 		return;
-	}
 
 	/* 改变标题栏的文字说明 */
 	lv_label_set_text_static(label_title, icon_grp[idx].icon_name);
+
+	/* 把上次选择的图标换为对应的白色图片 */
+	lv_obj_move_foreground(lvgl_img_get_obj(
+		lvgl_img_find(lvgl_img_win_get_list(icon_grp[last_idx].icon), "normal")));
+
+	/* 把当前图标图片换为对应的为红色图片 */
+	lv_obj_move_foreground(lvgl_img_get_obj(
+		lvgl_img_find(lvgl_img_win_get_list(icon_grp[idx].icon), "select")));
 
 	/* 计算目标y位置 */
 	int tar_y = -(ICON_SIZE + ICON_INTERVAL) * (idx - 1) - ICON_INTERVAL;
 
 	/* 滑动图标长图到目标位置 */
 	LV_OBJ_START_ANIM(icon_cont, y, tar_y, LV_OBJ_ANIM_EXEC_TIME);
+
+	/* 记录上次的图标索引 */
+	last_idx = idx;
 }
 
 /**

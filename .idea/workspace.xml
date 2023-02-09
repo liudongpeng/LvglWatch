@@ -51,7 +51,7 @@
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/QT/Desktop/LvglWatch&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/QT/Desktop/lvgl-watch&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -115,6 +115,10 @@
       <workItem from="1675645767757" duration="36320000" />
       <workItem from="1675770710839" duration="9406000" />
       <workItem from="1675858886016" duration="7008000" />
+      <workItem from="1675922971819" duration="9140000" />
+      <workItem from="1675935740203" duration="126000" />
+      <workItem from="1675948321358" duration="2398000" />
+      <workItem from="1675956160668" duration="32000" />
     </task>
     <servers />
   </component>
