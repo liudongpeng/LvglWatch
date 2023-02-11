@@ -11,7 +11,7 @@ extern "C" {
 
 
 
-#define LV_OBJ_ANIM_EXEC_TIME   200 /* lvgl对象动画执行时长 */
+#define LVGL_OBJ_ANIM_EXEC_TIME   200 /* lvgl对象动画执行时长 */
 
 
 

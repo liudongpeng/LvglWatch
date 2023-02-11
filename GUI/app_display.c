@@ -10,6 +10,7 @@
 #include "page_about.h"
 #include "page_dial_plate.h"
 #include "page_main_menu.h"
+#include "page_time_setting.h"
 
 #include <stdio.h>
 
@@ -44,6 +45,13 @@ static int app_windows_create()
 		return -3;
 	}
 
+	/* 创建"时间设置"界面窗口 */
+	if (time_setting_window_create() < 0)
+	{
+		printf("time_setting_window_create() failed"DEBUG_ERROR_INFO);
+		return -4;
+	}
+
 	return 0;
 }
 
@@ -67,11 +75,18 @@ static int app_pages_register()
 		return -2;
 	}
 
+	/* 注册"时间设置"界面 */
+	if (page_time_setting_register() < 0)
+	{
+		printf("page_time_setting_register() failed"DEBUG_ERROR_INFO);
+		return -3;
+	}
+
 	/* 注册"关于"界面 */
 	if (page_about_register() < 0)
 	{
 		printf("page_about_register() failed"DEBUG_ERROR_INFO);
-		return -3;
+		return -4;
 	}
 
 
@@ -79,7 +94,7 @@ static int app_pages_register()
 	if (page_push(&g_page_manager, Page_Dial) < 0)
 	{
 		printf("page_push() page_dial failed"DEBUG_ERROR_INFO);
-		return -3;
+		return -5;
 	}
 }
 

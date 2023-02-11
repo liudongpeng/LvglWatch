@@ -34,7 +34,7 @@ do                                              \
 {                                               \
     static lv_anim_t anim;                      \
                                                 \
-    lv_obj_add_anim(                            \
+    lvgl_obj_add_anim(                          \
     (obj),                                      \
     (&anim),                                    \
     ((lv_anim_exec_xcb_t)lv_obj_set_##attr),    \
@@ -53,9 +53,12 @@ lv_coord_t update_layout_and_get_obj_height(const lv_obj_t *obj);
 
 lv_coord_t update_layout_and_get_obj_y(const lv_obj_t *obj);
 
-void lv_obj_add_anim(lv_obj_t *obj, lv_anim_t *anim, lv_anim_exec_xcb_t anim_exec_cb,
+void lvgl_obj_add_anim(lv_obj_t *obj, lv_anim_t *anim, lv_anim_exec_xcb_t anim_exec_cb,
                      int start, int end, int time, lv_anim_ready_cb_t anim_ready_cb,
                      lv_anim_path_cb_t anim_path_cb);
+
+
+void lvgl_page_delay(int nms);
 
 
 #ifdef __cplusplus

@@ -286,8 +286,8 @@ do  \
     lv_coord_t y_ofs = abs(update_layout_and_get_obj_y(label_now) - update_layout_and_get_obj_y(label_next));   \
     \
     /* Ö´ÐÐ»¬¶¯¶¯»­ */    \
-    LV_OBJ_START_ANIM(label_now, y, update_layout_and_get_obj_y(label_now) + y_ofs, LV_OBJ_ANIM_EXEC_TIME); \
-    LV_OBJ_START_ANIM(label_next, y, update_layout_and_get_obj_y(label_next) + y_ofs, LV_OBJ_ANIM_EXEC_TIME);   \
+    LV_OBJ_START_ANIM(label_now, y, update_layout_and_get_obj_y(label_now) + y_ofs, LVGL_OBJ_ANIM_EXEC_TIME); \
+    LV_OBJ_START_ANIM(label_next, y, update_layout_and_get_obj_y(label_next) + y_ofs, LVGL_OBJ_ANIM_EXEC_TIME);   \
     }                                                               \
     \
 } while (0);

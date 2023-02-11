@@ -179,11 +179,6 @@ static void page_main_menu_icon_grp_create()
 
 		/* 把normal图标移到前台 */
 		lv_obj_move_foreground(lvgl_img_get_obj(lvgl_img_find(lvgl_img_win_get_list(img_wim), "normal")));
-		printf("in page_main_menu_icon_grp_create(), img_wim: %p, img_wim->img_list: %p, lvgl_img_win_get_list(img_wim): %p\n",
-		       img_wim, img_wim->img_list, lvgl_img_win_get_list(img_wim));
-
-		printf("in page_main_menu_icon_grp_create(), img_wim: %p, lvgl_img_win_get_win(img_wim): %p\n", img_wim,
-		       lvgl_img_win_get_win(img_wim));
 
 		/* 设置每个图标显示窗口的位置 */
 		lv_obj_set_y(lvgl_img_win_get_win(img_wim), (ICON_SIZE + ICON_INTERVAL) * i);
@@ -235,7 +230,7 @@ static void page_main_menu_icon_grp_move_focus(uint8_t idx)
 	int tar_y = -(ICON_SIZE + ICON_INTERVAL) * (idx - 1) - ICON_INTERVAL;
 
 	/* 滑动图标长图到目标位置 */
-	LV_OBJ_START_ANIM(icon_cont, y, tar_y, LV_OBJ_ANIM_EXEC_TIME);
+	LV_OBJ_START_ANIM(icon_cont, y, tar_y, LVGL_OBJ_ANIM_EXEC_TIME);
 
 	/* 记录上次的图标索引 */
 	last_idx = idx;
@@ -266,13 +261,19 @@ static void page_main_menu_icon_grp_move(int8_t dir)
  */
 static void page_main_menu_setup()
 {
+	printf("enter page_main_menu_setup()\n");
+
 	lv_obj_move_foreground(app_win);
+
+	icon_idx_cur = 0;
 
 	page_main_menu_title_create();
 	page_main_menu_icon_grp_create();
 	page_main_menu_img_shadow_create();
 
 	page_main_menu_icon_grp_move_focus(icon_idx_cur);
+
+	printf("leave page_main_menu_setup()\n");
 }
 
 /**
@@ -280,13 +281,17 @@ static void page_main_menu_setup()
  */
 static void page_main_menu_exit()
 {
+	printf("enter page_main_menu_exit()\n");
+
 	/* 图标全部滑出 */
-	LV_OBJ_START_ANIM(icon_cont, y, update_layout_and_get_obj_height(icon_disp) + ICON_SIZE, LV_OBJ_ANIM_EXEC_TIME);
+	LV_OBJ_START_ANIM(icon_cont, y, update_layout_and_get_obj_height(icon_disp) + ICON_SIZE, LVGL_OBJ_ANIM_EXEC_TIME);
+
+	/* 界面延时, 延时期间保持界面刷新 */
+//	lvgl_page_delay(LVGL_OBJ_ANIM_EXEC_TIME);
 
 	lv_obj_clean(app_win);
 
-	/* 图标索引清零 */
-	icon_idx_cur = 0;
+	printf("leave page_main_menu_exit()\n\n");
 }
 
 /**

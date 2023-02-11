@@ -70,7 +70,7 @@ lv_coord_t update_layout_and_get_obj_y(const lv_obj_t *obj)
  * @param[in]	anim_ready_cb
  * @param[in]	anim_path_cb
  */
-void lv_obj_add_anim(lv_obj_t *obj, lv_anim_t *anim, lv_anim_exec_xcb_t anim_exec_cb,
+void lvgl_obj_add_anim(lv_obj_t *obj, lv_anim_t *anim, lv_anim_exec_xcb_t anim_exec_cb,
                      int start, int end, int time, lv_anim_ready_cb_t anim_ready_cb,
                      lv_anim_path_cb_t anim_path_cb)
 {
@@ -92,4 +92,18 @@ void lv_obj_add_anim(lv_obj_t *obj, lv_anim_t *anim, lv_anim_exec_xcb_t anim_exe
 	lv_anim_set_time(anim, time);
 	lv_anim_set_var(anim, obj);
 	lv_anim_start(anim);
+}
+
+/**
+ * @brief 延时, 延时期间保持屏幕刷新
+ * @param[in]	nms
+ */
+void lvgl_page_delay(int nms)
+{
+	uint32_t last = lv_tick_get();
+
+	while (lv_tick_get() - nms < last)
+	{
+		lv_task_handler();
+	}
 }

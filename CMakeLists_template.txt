@@ -80,6 +80,7 @@ include_directories(
         GUI/user_page/page_about
         GUI/user_page/page_dial_plate
         GUI/user_page/page_main_menu
+        GUI/user_page/page_time_setting
         GUI/user_page/page_stop_watch
 
         Util/debug_print
@@ -117,6 +118,7 @@ file(GLOB_RECURSE SOURCES "Core/*.*" "Middlewares/*.*" "Drivers/*.*"
         "GUI/user_page/page_about/*.*"
         "GUI/user_page/page_dial_plate/*.*"
         "GUI/user_page/page_main_menu/*.*"
+        "GUI/user_page/page_time_setting"
         "GUI/user_page/page_stop_watch/*.*"
 
         "Util/debug_print/*.*"

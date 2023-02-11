@@ -105,7 +105,7 @@ void MX_FREERTOS_Init(void)
 	HAL_TIM_Base_Start_IT(&LVGL_TICK_TIM_HANDLE);
 
 	/* 界面管理器初始化 */
-	page_manager_create(&g_page_manager, 10, 10);
+	page_manager_create(&g_page_manager, 15, 15);
 
 	/* 软件界面显示初始化 */
 	app_display_init();

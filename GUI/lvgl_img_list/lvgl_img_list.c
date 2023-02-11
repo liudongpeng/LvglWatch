@@ -202,8 +202,6 @@ lvgl_img_t* lvgl_img_find(lvgl_img_t* list, char* name)
 	cur = list->next;
 	while (cur != NULL)
 	{
-		printf("tar_name: %p, cur_name: %p", name, cur->name);
-
 		if (strcmp(cur->name, name) == 0)
 			return cur;
 
