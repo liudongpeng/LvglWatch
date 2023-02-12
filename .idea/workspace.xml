@@ -68,11 +68,6 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="LvglWatch.elf" type="com.jetbrains.cidr.embedded.openocd.conf.type" factoryName="com.jetbrains.cidr.embedded.openocd.conf.factory" nameIsGenerated="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="LvglWatch" TARGET_NAME="LvglWatch.elf" CONFIG_NAME="Debug" version="1" RUN_TARGET_PROJECT_NAME="LvglWatch" RUN_TARGET_NAME="LvglWatch.elf">
       <openocd version="1" gdb-port="3333" telnet-port="4444" board-config="C:\Users\summer\Desktop\LvglWatch\stlink.cfg" reset-type="INIT" download-type="ALWAYS">
         <debugger toolchainName="MinGW-STM32" />
@@ -121,6 +116,7 @@
       <workItem from="1675956160668" duration="32000" />
       <workItem from="1675987123204" duration="319000" />
       <workItem from="1676040920488" duration="29197000" />
+      <workItem from="1676162730627" duration="5159000" />
     </task>
     <servers />
   </component>

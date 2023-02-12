@@ -25,6 +25,13 @@
 
 int bsp_rtc_init();
 
+void bsp_rtc_get_time(RTC_TimeTypeDef* time);
+void bsp_rtc_get_date(RTC_DateTypeDef* date);
+void bsp_rtc_get_week(RTC_DateTypeDef* date);
+
+void bsp_rtc_set_time(RTC_TimeTypeDef* time);
+void bsp_rtc_set_date(RTC_DateTypeDef* date);
+
 void bsp_rtc_date_backup();
 void bsp_rtc_time_backup();
 

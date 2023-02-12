@@ -239,7 +239,7 @@ static void timer_task_time_update(lv_timer_t *timer)
  */
 static void date_update()
 {
-	HAL_RTC_GetDate(&hrtc, &rtc_data, RTC_FORMAT_BIN);
+	bsp_rtc_get_date(&rtc_data);
 
 	const char *week[7] = { "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN" };
 	int idx = rtc_data.WeekDay - 1;
@@ -299,7 +299,7 @@ do  \
 static void time_update()
 {
 	/* 获取RTC时间 */
-	HAL_RTC_GetTime(&hrtc, &rtc_time, RTC_FORMAT_BIN);
+	bsp_rtc_get_time(&rtc_time);
 
 	/* 分钟个位 */
 	LABEL_TIME_UPDATE_IF_VAL_CHANGE(rtc_time.Minutes % 10, rtc_time_last.Minutes % 10, 3);
@@ -370,10 +370,8 @@ int dial_window_create()
 		return -1;
 
 	lv_obj_set_scrollbar_mode(app_win, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
-//	lv_obj_set_size(app_win, APP_WIN_WIDTH(lv_scr_act()), APP_WIN_HEIGHT(lv_scr_act()));
-	lv_obj_set_size(app_win, 135, 240);
+	lv_obj_set_size(app_win, APP_WIN_WIDTH(lv_scr_act()), APP_WIN_HEIGHT(lv_scr_act()));
 	lv_obj_center(app_win);
-
 
 	static lv_style_t style;
 	lv_style_init(&style);

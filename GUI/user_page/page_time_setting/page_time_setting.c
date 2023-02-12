@@ -153,38 +153,42 @@ static void page_time_setting_time_date_label_create()
 	lv_style_set_text_color(&style, lv_color_white());
 
 	/* 获取当前RTC时间 */
-	HAL_RTC_GetTime(&hrtc, &rtc_time, RTC_FORMAT_BIN);
+	bsp_rtc_get_time(&rtc_time);
 	/* 创建时间标签 */
 	label_time = lv_label_create(time_disp);
 	lv_label_set_recolor(label_time, true);
 	lv_obj_center(label_time);
 	lv_obj_add_style(label_time, &style, LV_PART_MAIN);
 	page_time_setting_label_time_update(0); /* 更新时间标签 */
+//	printf("test1, %s|%s(%d)\n", __FILE__, __FUNCTION__, __LINE__);
 
 	/* 获取日期 */
-	HAL_RTC_GetDate(&hrtc, &rtc_date, RTC_FORMAT_BIN);
+	bsp_rtc_get_date(&rtc_date);
 	/* 创建年月日周标签 */
+	label_week = lv_label_create(date_disp);
+	lv_label_set_recolor(label_week, true);
+	lv_obj_align(label_week, LV_ALIGN_BOTTOM_MID, 0, -10);
+	lv_obj_add_style(label_week, &style, LV_PART_MAIN);
+	page_time_setting_label_week_update();  /* 更新星期标签 */
+//	printf("test2, %s|%s(%d)\n", __FILE__, __FUNCTION__, __LINE__);
+
 	label_year = lv_label_create(date_disp);
 	lv_label_set_recolor(label_year, true);
 	lv_obj_align(label_year, LV_ALIGN_TOP_MID, 0, 10);
 	lv_obj_add_style(label_year, &style, LV_PART_MAIN);
 	page_time_setting_label_year_update(0); /* 更新年份标签 */
+//	printf("test3, %s|%s(%d)\n", __FILE__, __FUNCTION__, __LINE__);
 
 	label_date = lv_label_create(date_disp);
 	lv_label_set_recolor(label_date, true);
 	lv_obj_center(label_date);
 	lv_obj_add_style(label_date, &style, LV_PART_MAIN);
 	page_time_setting_label_date_update(0); /* 更新日期标签 */
-
-	label_week = lv_label_create(date_disp);
-	lv_label_set_recolor(label_week, true);
-	lv_obj_align(label_week, LV_ALIGN_BOTTOM_MID, 0, -10);
-	lv_obj_add_style(label_week, &style, LV_PART_MAIN);
-	page_time_setting_label_week_update();  /* 更新星期标签 */
+//	printf("test4, %s|%s(%d)\n", __FILE__, __FUNCTION__, __LINE__);
 }
 
 /**
- * @brief 更新时间标签, 高亮选中的项目, 时分秒索引分别是012
+ * @brief 更新时间标签
  * @param[in]	item: 时0 分1 秒2
  */
 static void page_time_setting_label_time_update(uint8_t item)
@@ -203,7 +207,7 @@ static void page_time_setting_label_time_update(uint8_t item)
 }
 
 /**
- * @brief 更新日期标签, 月日的索引分别为01
+ * @brief 更新日期标签
  * @param[in]	item: 月0 日1
  */
 static void page_time_setting_label_date_update(uint8_t item)
@@ -227,16 +231,17 @@ static void page_time_setting_label_date_update(uint8_t item)
  */
 static void page_time_setting_label_week_update()
 {
-	static const char *week[] = {"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
+	const char *week[] = {"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
 	int8_t idx;
 
-	HAL_RTC_GetDate(&hrtc, &rtc_date, RTC_FORMAT_BIN);
+	/* 更新星期 */
+	bsp_rtc_get_week(&rtc_date);
 
 	idx = rtc_date.WeekDay - 1;
 	if (idx < 0 || idx > 6)
 		idx = 0;
 
-	lv_label_set_text_static(label_week, week[idx]);
+	lv_label_set_text(label_week, week[idx]);
 }
 
 /**
@@ -273,7 +278,7 @@ static void page_time_setting_label_title_update()
 	else
 		text = title[cur_cfg_item];
 
-	lv_label_set_text_static(label_title, text);
+	lv_label_set_text(label_title, text);
 }
 
 /**
@@ -282,68 +287,91 @@ static void page_time_setting_label_title_update()
  */
 static void page_time_setting_time_cfg_val_update(int8_t opt)
 {
+	int8_t val;  /* 用有符号数, 方便操作 */
+
 	page_time_setting_label_title_update();
 
-	if (cur_cfg_item != 0 && opt != 0)
+	if (cur_cfg_item != RTC_Item_None && opt != 0)
 		cfg_changed = true;
 
 	/* 时间设置 */
-	if (cur_cfg_item >= 1 && cur_cfg_item <= 3)
+	if (cur_cfg_item >= RTC_Item_Hour && cur_cfg_item <= RTC_Item_Second)
 	{
 		switch (cur_cfg_item)
 		{
 			case 1:
-				rtc_time.Hours += opt;
-				if (rtc_time.Hours < 0 || rtc_time.Hours > 23)
-					rtc_time.Hours = 0;
+				val = (int8_t)(rtc_time.Hours + opt);
+				if (val < 0 )
+					val = 23;
+				if (val > 23)
+					val = 0;
+				rtc_time.Hours = val;
 				break;
 
 			case 2:
-				rtc_time.Minutes += opt;
-				if (rtc_time.Minutes < 0 || rtc_time.Minutes > 59)
-					rtc_time.Minutes = 0;
+				val = (int8_t)(rtc_time.Minutes + opt);
+				if (val < 0)
+					val = 59;
+				if (val > 59)
+					val = 0;
+				rtc_time.Minutes = val;
 				break;
 
 			case 3:
-				rtc_time.Seconds += opt;
-				if (rtc_time.Seconds < 0 || rtc_time.Hours > 59)
-					rtc_time.Seconds = 0;
+				val = (int8_t)(rtc_time.Seconds + opt);
+				if (val < 0)
+					val = 59;
+				if (val > 59)
+					val = 0;
+				rtc_time.Seconds = val;
 				break;
 
 			default:
 				break;
 		}
+		bsp_rtc_set_time(&rtc_time);    /* 每次更改都记录一下 */
 		page_time_setting_label_time_update(cur_cfg_item);
 	}
 	else
 		page_time_setting_label_time_update(0);
 
 	/* 年份设置 */
-	if (cur_cfg_item == 4)
+	if (cur_cfg_item == RTC_Item_Year)
 	{
-		rtc_date.Year += opt;
-		if (rtc_date.Year < 0 || rtc_date.Year > 99)
-			rtc_date.Year = 0;
+		val = (int8_t)(rtc_date.Year + opt);
+		if (val < 0)
+			val = 99;
+		if (val > 99)
+			val = 0;
+		rtc_date.Year = val;
+		bsp_rtc_set_date(&rtc_date);    /* 每次更改都记录一下 */
 		page_time_setting_label_year_update(1);
 	}
 	else
 		page_time_setting_label_year_update(0);
 
 	/* 日期设置 */
-	if (cur_cfg_item >= 5 && cur_cfg_item <= 6)
+	if (cur_cfg_item >= RTC_Item_Month && cur_cfg_item <= RTC_Item_Date)
 	{
 		if (cur_cfg_item == 5)
 		{
-			rtc_date.Month += opt;
-			if (rtc_date.Month < 0 || rtc_date.Month > 12)
-				rtc_date.Month = 0;
+			val = (int8_t)(rtc_date.Month + opt);
+			if (val < 0)
+				val = 12;
+			if (val > 12)
+				val = 0;
+			rtc_date.Month = val;
 		}
 		else
 		{
-			rtc_date.Date += opt;
-			if (rtc_date.Date < 0 || rtc_date.Date > 31)
-				rtc_date.Date = 0;
+			val = (int8_t)(rtc_date.Date + opt);
+			if (val < 0)
+				val = 31;
+			if (val > 31)
+				val = 0;
+			rtc_date.Date = val;
 		}
+		bsp_rtc_set_date(&rtc_date);    /* 每次更改都记录一下 */
 		page_time_setting_label_date_update(cur_cfg_item - 4);
 	}
 	else
@@ -363,7 +391,9 @@ static void page_time_setting_setup()
 	cfg_changed = false;
 
 	page_time_setting_title_create();
+	printf("test1\n");
 	page_time_setting_time_date_disp_create();
+	printf("test2\n");
 	page_time_setting_time_date_label_create();
 
 	printf("leave page_time_setting_setup()\n\n");
@@ -395,15 +425,17 @@ static void page_time_setting_event_handle(void *btn, int event)
 			case ButtonEvent_DoubleClick:
 				if (cur_cfg_item == 0 && cfg_changed)
 				{
-					HAL_RTC_SetTime(&hrtc, &rtc_time, RTC_FORMAT_BIN);
-					HAL_RTC_SetDate(&hrtc, &rtc_date, RTC_FORMAT_BIN);
+					bsp_rtc_set_time(&rtc_time);
+					bsp_rtc_set_date(&rtc_date);
 				}
 				page_pop(&g_page_manager);
 				break;
 
 			case ButtonEvent_SingleClick:
-				cur_cfg_item += 1;
-				if (cur_cfg_item < 0 || cur_cfg_item > 6)
+				cur_cfg_item++;
+				if (cur_cfg_item < 0)
+					cur_cfg_item = 6;
+				if (cur_cfg_item > 6)
 					cur_cfg_item = 0;
 				page_time_setting_time_cfg_val_update(0);
 				break;

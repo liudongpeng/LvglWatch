@@ -34,6 +34,61 @@ int bsp_rtc_init()
 }
 
 /**
+ * @brief 获取RTC时间
+ * @param[out]	time
+ */
+void bsp_rtc_get_time(RTC_TimeTypeDef* time)
+{
+	RTC_DateTypeDef tmp;
+
+	HAL_RTC_GetTime(&hrtc, time, RTC_FORMAT_BIN);
+	HAL_RTC_GetDate(&hrtc, &tmp, RTC_FORMAT_BIN);
+}
+
+/**
+ * @brief 获取RTC日期
+ * @param[out]	date
+ */
+void bsp_rtc_get_date(RTC_DateTypeDef* date)
+{
+	RTC_TimeTypeDef tmp;
+
+	HAL_RTC_GetTime(&hrtc, &tmp, RTC_FORMAT_BIN);
+	HAL_RTC_GetDate(&hrtc, date, RTC_FORMAT_BIN);
+}
+
+/**
+ * @brief 获取RTC星期
+ * @param[out]	date
+ */
+void bsp_rtc_get_week(RTC_DateTypeDef* date)
+{
+	RTC_TimeTypeDef tmp;
+
+	HAL_RTC_GetTime(&hrtc, &tmp, RTC_FORMAT_BIN);
+	HAL_RTC_GetDate(&hrtc, date, RTC_FORMAT_BIN);
+}
+
+/**
+ * @brief 设置RTC时间
+ * @param[in]	time
+ */
+void bsp_rtc_set_time(RTC_TimeTypeDef* time)
+{
+	HAL_RTC_SetTime(&hrtc, time, RTC_FORMAT_BIN);
+}
+
+/**
+ * @brief 设置RTC日期
+ * @param[in]	date
+ */
+void bsp_rtc_set_date(RTC_DateTypeDef* date)
+{
+	HAL_RTC_SetDate(&hrtc, date, RTC_FORMAT_BIN);
+}
+
+
+/**
  * @brief RTC日期备份
  * @return
  */

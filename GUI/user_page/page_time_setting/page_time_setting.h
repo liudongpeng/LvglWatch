@@ -15,6 +15,25 @@ extern "C" {
 extern page_t page_time_setting;    /* "时间设置"界面 */
 
 
+/**
+ * @brief 设置日期时间时的项目编号
+ */
+enum rtc_item
+{
+	RTC_Item_None = 0,
+
+	RTC_Item_Hour,
+	RTC_Item_Minute,
+	RTC_Item_Second,
+
+	RTC_Item_Year,
+
+	RTC_Item_Month,
+	RTC_Item_Date,
+
+};
+
+
 
 
 int time_setting_window_create();
