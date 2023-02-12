@@ -261,8 +261,6 @@ static void page_main_menu_icon_grp_move(int8_t dir)
  */
 static void page_main_menu_setup()
 {
-	printf("enter page_main_menu_setup()\n");
-
 	lv_obj_move_foreground(app_win);
 
 	icon_idx_cur = 0;
@@ -272,8 +270,6 @@ static void page_main_menu_setup()
 	page_main_menu_img_shadow_create();
 
 	page_main_menu_icon_grp_move_focus(icon_idx_cur);
-
-	printf("leave page_main_menu_setup()\n");
 }
 
 /**
@@ -281,17 +277,13 @@ static void page_main_menu_setup()
  */
 static void page_main_menu_exit()
 {
-	printf("enter page_main_menu_exit()\n");
-
 	/* 图标全部滑出 */
 	LV_OBJ_START_ANIM(icon_cont, y, update_layout_and_get_obj_height(icon_disp) + ICON_SIZE, LVGL_OBJ_ANIM_EXEC_TIME);
 
 	/* 界面延时, 延时期间保持界面刷新 */
-//	lvgl_page_delay(LVGL_OBJ_ANIM_EXEC_TIME);
+	lvgl_page_delay(LVGL_OBJ_ANIM_EXEC_TIME);
 
 	lv_obj_clean(app_win);
-
-	printf("leave page_main_menu_exit()\n\n");
 }
 
 /**

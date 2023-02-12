@@ -16,6 +16,7 @@
 
 #include "bmp280.h"
 
+#include <stdio.h>
 
 /* 增益 */
 int32_t t_fine;
@@ -85,31 +86,26 @@ int bmp280_create(bmp280_t *bmp280, i2c_mem_write_t i2c_write, i2c_mem_read_t i2
  */
 int bmp280_init(bmp280_t *bmp280)
 {
-	uint8_t ret = 0;
-
 	/* 001 : 16 bit / 0.0050 °C
 	 * 111 : 20 bit / 0.16 Pa
 	 *  11 : Normal mode
 	 */
 	uint8_t reg = 0xE7;
 
-	if (bmp280 == NULL || bmp280->i2c_mem_write == NULL)
+	if (bmp280 == NULL)
 		return -1;
 
 	/* 获取芯片ID */
-	ret = bmp280_get_chipid(bmp280);
-	if (ret != BMP280_CHIPID)
-		return ret;
+	if (bmp280_get_chipid(bmp280) != BMP280_CHIPID)
+		return -2;
 
 	/* 配置ctrl_meas寄存器 */
-	ret = bmp280->i2c_mem_write(BMP280_I2C_ADDRESS, BMP280_REGISTER_CONTROL, &reg, 1);
-	if (ret != 0)
-		return ret;
+	if (bmp280->i2c_mem_write(BMP280_I2C_ADDRESS, BMP280_REGISTER_CONTROL, &reg, 1) != 0)
+		return -3;
 
 	/* 读取校准参数 */
-	ret = bmp280_read_calib(bmp280);
-	if (ret != 0)
-		return ret;
+	if (bmp280_read_calib(bmp280) != 0)
+		return -4;
 
 	return 0;
 }
@@ -124,13 +120,13 @@ int bmp280_get_chipid(bmp280_t *bmp280)
 	uint8_t ret = 0;
 	uint8_t chipid = 0;
 
-
-	if (bmp280 == NULL || bmp280->i2c_mem_read)
+	if (bmp280 == NULL || bmp280->i2c_mem_read == NULL)
 		return -1;
 
-	ret = bmp280->i2c_mem_read(BMP280_I2C_ADDRESS, BMP280_REGISTER_CHIPID, &chipid, 1);
-	if (ret != 0)
-		return ret;
+	printf("------------------------test------------------------\n");
+
+	if (bmp280->i2c_mem_read(BMP280_I2C_ADDRESS, BMP280_REGISTER_CHIPID, &chipid, 1) != 0)
+		return -2;
 
 	return chipid;
 }
@@ -145,7 +141,7 @@ int bmp280_softreset(bmp280_t *bmp280)
 	uint8_t ret = 0;
 	uint8_t softreset = BMP280_SOFTRESET;
 
-	if (bmp280 == NULL || bmp280->i2c_mem_write)
+	if (bmp280 == NULL || bmp280->i2c_mem_write == NULL)
 		return -1;
 
 	ret = bmp280->i2c_mem_write(BMP280_I2C_ADDRESS, BMP280_REGISTER_SOFTRESET, &softreset, 1);
@@ -166,7 +162,7 @@ float bmp280_get_temperature(bmp280_t *bmp280)
 	uint8_t reg[3];
 	uint8_t ret;
 
-	if (bmp280 == NULL || bmp280->i2c_mem_read)
+	if (bmp280 == NULL || bmp280->i2c_mem_read == NULL)
 		return -1;
 
 	ret = bmp280->i2c_mem_read(BMP280_I2C_ADDRESS, BMP280_REGISTER_TEMPDATA, reg, 3);
@@ -202,7 +198,7 @@ float bmp280_get_pressure(bmp280_t *bmp280)
 	uint8_t reg[3];
 	uint8_t ret;
 
-	if (bmp280 == NULL || bmp280->i2c_mem_read)
+	if (bmp280 == NULL || bmp280->i2c_mem_read == NULL)
 		return -1;
 
 	ret = bmp280->i2c_mem_read(BMP280_I2C_ADDRESS, BMP280_REGISTER_PRESSUREDATA, reg, 3);

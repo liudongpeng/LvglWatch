@@ -63,6 +63,7 @@ include_directories(
         BSP
         BSP/bsp_rtc
         BSP/bsp_config
+        BSP/bsp_bmp280
         BSP/bsp_button
         BSP/bsp_led
         BSP/bsp_display
@@ -101,6 +102,7 @@ file(GLOB_RECURSE SOURCES "Core/*.*" "Middlewares/*.*" "Drivers/*.*"
         "BSP/bsp.h"
         "BSP/bsp_rtc/*.*"
         "BSP/bsp_config/*.*"
+        "BSP/bsp_bmp280/*.*"
         "BSP/bsp_button/*.*"
         "BSP/bsp_led/*.*"
         "BSP/bsp_display/*.*"

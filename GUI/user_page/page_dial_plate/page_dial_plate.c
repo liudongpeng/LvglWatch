@@ -13,7 +13,6 @@
 extern RTC_HandleTypeDef hrtc;  /* RTC句柄 */
 
 extern page_manager_t g_page_manager;    /* 界面管理器, 在freertos.c文件中定义 */
-
 page_t page_dial;   /* "表盘"界面 */
 
 static lv_obj_t *app_win;       /* "主菜单"界面窗口, 用于绘制其他控件 */
@@ -29,6 +28,11 @@ static lv_obj_t *label_time_grp_bk[4];
 static lv_obj_t *time_cont;     /* 时间容器 */
 static lv_obj_t *led_sec[2];    /* 秒指示灯 */
 
+/* 两个秒钟标签交替使用实现上下滑动效果 */
+static lv_obj_t *label_second_grp[2];
+static lv_obj_t *label_second_grp_bk[2];
+static lv_obj_t *second_cont;     /* 秒钟容器 */
+
 static lv_obj_t *icon_run;      /* 运动图标 */
 static lv_obj_t *label_step_cnt;    /* 计步次数 */
 
@@ -42,18 +46,12 @@ static RTC_TimeTypeDef rtc_time;        /* 当前RTC时间 */
 
 
 
-/* ------ 测试用 ------ */
-int timeTest;
-static lv_obj_t *labelTimeTest;
-
-/* ------ 测试用 ------ */
-
-
 
 static void page_dial_bg_create();
 static void page_dial_state_bar_create();
 static void page_dial_label_date_create();
 static void page_dial_label_time_create();
+static void page_dial_label_second_create();
 static void page_dial_led_create();
 
 static void timer_task_state_bar_update(lv_timer_t *timer);
@@ -102,6 +100,7 @@ static void page_dial_state_bar_create()
 
 	/* 创建状态栏更新任务, 用定时器定时更新 */
 	timer_state_bar_update = lv_timer_create(timer_task_state_bar_update, 2 * 1000, NULL);
+	timer_task_state_bar_update(timer_state_bar_update);
 }
 
 /**
@@ -174,12 +173,68 @@ static void page_dial_label_time_create()
 		label_time_grp_bk[i] = label;
 	}
 
+	/* 创建秒钟标签区域 */
+	page_dial_label_second_create();
+
 	/* 清空上次记录的时间!!! */
 	memset(&rtc_time_last, 0, sizeof(rtc_time_last));
 	/* 创建时间更新任务 */
 	timer_time_update = lv_timer_create(timer_task_time_update, 500, NULL);
 	time_update();
 }
+
+/**
+ * @brief 创建秒钟显示标签
+ */
+static void page_dial_label_second_create()
+{
+	LV_FONT_DECLARE(HandGotn_26);
+	LV_FONT_DECLARE(EuroStar_26);
+	LV_FONT_DECLARE(EuroStar_60);
+
+	/* 秒钟标签显示窗口 */
+	second_cont = lv_obj_create(app_win);
+	lv_obj_set_scrollbar_mode(second_cont, LV_SCROLLBAR_MODE_OFF);  /* 关闭水平和竖直滚动条 */
+	lv_obj_set_style_bg_opa(second_cont, LV_OPA_TRANSP, 0);   /* 设置背景透明 */
+	lv_obj_set_size(second_cont, 50, 50);
+	lv_obj_align_to(second_cont, time_cont, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+
+	static lv_style_t style_second_cont;
+	lv_style_init(&style_second_cont);
+	lv_style_set_radius(&style_second_cont, 0); /* 设置边框弧度 */
+	lv_style_set_border_color(&style_second_cont, lv_color_make(0xff, 0, 0));
+	lv_style_set_border_side(&style_second_cont, LV_BORDER_SIDE_NONE);  /* 设置边框位置为 不显示 */
+	lv_style_set_pad_all(&style_second_cont, 0);    /* 设置此窗口上下左右全部padding大小为0 */
+	lv_obj_add_style(second_cont, &style_second_cont, 0);
+
+	/* 秒钟标签 */
+	static lv_style_t style_label_second;
+	lv_style_init(&style_label_second);
+	lv_style_set_text_color(&style_label_second, lv_color_make(0xff, 0, 0));
+	lv_style_set_text_font(&style_label_second, &HandGotn_26);
+
+	const static lv_coord_t x_pos[2] = {-10, 10};
+	for (int i = 0; i < sizeof(label_second_grp) / sizeof(label_second_grp[0]); i++)
+	{
+		lv_obj_t *label = lv_label_create(second_cont);
+		lv_label_set_text(label, "0");
+		lv_obj_add_style(label, &style_label_second, 0);
+		lv_obj_align(label, LV_ALIGN_CENTER, x_pos[i], 0);
+
+		label_second_grp[i] = label;
+	}
+
+	for (int i = 0; i < sizeof(label_second_grp_bk) / sizeof(label_second_grp_bk[0]); i++)
+	{
+		lv_obj_t *label = lv_label_create(second_cont);
+		lv_label_set_text(label, "0");
+		lv_obj_add_style(label, &style_label_second, 0);
+		lv_obj_align_to(label, label_second_grp[i], LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
+
+		label_second_grp_bk[i] = label;
+	}
+}
+
 
 /**
  * @brief 创建时间标签中间的led
@@ -211,7 +266,10 @@ static void timer_task_state_bar_update(lv_timer_t *timer)
 #define LV_SYMBOL_DEGREE_SIGN   "\xC2\xB0"
 
 	/* 气压计更新 */
-	lv_label_set_text_fmt(label_bmp280, "% 2dC"LV_SYMBOL_DEGREE_SIGN" %dm", 1, 1);
+	float temp = 0, pres = 0;
+//	temp = bmp280_get_temperature(&g_bmp280);
+//	pres = bmp280_get_pressure(&g_bmp280);
+	lv_label_set_text_fmt(label_bmp280, "% 2dC"LV_SYMBOL_DEGREE_SIGN" %dm", temp, pres);
 
 	/* 电池信息更新 */
 
@@ -243,12 +301,11 @@ static void date_update()
 
 	const char *week[7] = { "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN" };
 	int idx = rtc_data.WeekDay - 1;
-	if (idx < 0 || idx > 6)
+	if (idx < 0)
+		idx = 6;
+	if (idx > 6)
 		idx = 0;
 	lv_label_set_text_fmt(label_date, "%02d#FF0000 /#%02d %s", rtc_data.Month, rtc_data.Date, week[idx]);
-
-	/* 日期备份 */
-//	bsp_rtc_date_backup();
 };
 
 /**
@@ -294,6 +351,49 @@ do  \
 
 
 /**
+ * @brief 更新秒钟标签
+ * @param[in]   cur_val
+ * @param[in]   last_val
+ * @param[in]   index
+*/
+#define LABEL_SECOND_UPDATE_IF_VAL_CHANGE(cur_val, last_val, index) \
+do  \
+{   \
+    if ((cur_val) != (last_val))    \
+    {   \
+        lv_obj_t* label_now, *label_next;   \
+    \
+    /* 判断两个标签的相对位置, 以此来确定谁是下一个标签 */ \
+    if (update_layout_and_get_obj_y(label_second_grp_bk[(index)]) > update_layout_and_get_obj_y(label_second_grp[(index)]))   \
+    {   \
+        label_now = label_second_grp[(index)];    \
+        label_next = label_second_grp_bk[(index)];    \
+    }   \
+    else    \
+    {   \
+        label_now = label_second_grp_bk[(index)]; \
+        label_next = label_second_grp[(index)];   \
+    }   \
+    \
+    lv_label_set_text_fmt(label_now, "%d", (last_val)); \
+    lv_label_set_text_fmt(label_next, "%d", (cur_val)); \
+    \
+    /* 把下一次要显示的标签移出显示区域 */  \
+    lv_obj_align_to(label_next, label_now, LV_ALIGN_OUT_TOP_MID, 0, -10);   \
+    \
+    /* 计算y偏移 */ \
+    lv_coord_t y_ofs = abs(update_layout_and_get_obj_y(label_now) - update_layout_and_get_obj_y(label_next));   \
+    \
+    /* 执行滑动动画 */    \
+    LV_OBJ_START_ANIM(label_now, y, update_layout_and_get_obj_y(label_now) + y_ofs, 50);    \
+    LV_OBJ_START_ANIM(label_next, y, update_layout_and_get_obj_y(label_next) + y_ofs, 50);  \
+    }                                                               \
+    \
+} while (0);
+
+
+
+/**
  * @brief 时间更新
  */
 static void time_update()
@@ -311,10 +411,12 @@ static void time_update()
 	/* 小时十位 */
 	LABEL_TIME_UPDATE_IF_VAL_CHANGE(rtc_time.Hours / 10, rtc_time_last.Hours / 10, 0);
 
-	rtc_time_last = rtc_time;
+	/* 秒钟个位 */
+	LABEL_SECOND_UPDATE_IF_VAL_CHANGE(rtc_time.Seconds % 10, rtc_time_last.Seconds % 10, 1);
+	/* 秒钟十位 */
+	LABEL_SECOND_UPDATE_IF_VAL_CHANGE(rtc_time.Seconds / 10, rtc_time_last.Seconds / 10, 0);
 
-	/* 把当前时间做备份 */
-//	bsp_rtc_time_backup();
+	rtc_time_last = rtc_time;
 }
 
 
@@ -330,7 +432,6 @@ static void page_dial_setup()
 	page_dial_label_date_create();
 	page_dial_label_time_create();
 	page_dial_led_create();
-
 
 	printf("leave page_dial_setup()\n");
 }

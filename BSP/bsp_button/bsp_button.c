@@ -61,6 +61,4 @@ static void button_event_handler(void* btn, int event)
 
 	flag = !flag;
 	flag ? led_open(&g_user_led) : led_close(&g_user_led);
-
-	printf("btn event -> %d\n", event);
 }

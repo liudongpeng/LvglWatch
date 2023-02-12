@@ -27,6 +27,14 @@ extern "C" {
 void user_led_set_level(uint8_t level);
 
 
+/* ------------------------------ bmp280 ------------------------------ */
+#define BMP280_I2C  I2C1            /* bmp280 I2C接口 */
+#define BMP280_I2C_HANDLER  hi2c1   /* bmp280 I2C接口句柄 */
+
+int bmp280_i2c_mem_write(uint8_t dev_addr, uint8_t reg_addr, uint8_t *buf, uint16_t len);
+int bmp280_i2c_mem_read(uint8_t dev_addr, uint8_t reg_addr, uint8_t *buf, uint16_t len);
+
+
 /* ------------------------------ button ------------------------------ */
 #define BTN_SCAN_TIM TIM4            /* 按键扫描定时器 */
 #define BTN_SCAN_TIM_HANDLER htim4   /* 按键扫描定时器句柄 */
