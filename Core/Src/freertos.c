@@ -93,7 +93,6 @@ void MX_FREERTOS_Init(void) {
 
 //	bsp_rtc_init();
 	bsp_bmp280_init();
-	bmp280_get_temperature(&g_bmp280);
 	bsp_button_init();
 	bsp_led_init();
 	bsp_display_init();

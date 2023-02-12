@@ -63,11 +63,6 @@
   }
 }</component>
   <component name="RunManager" selected="OpenOCD Download &amp; Run.LvglWatch.elf">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="LvglWatch.elf" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="LvglWatch" TARGET_NAME="LvglWatch.elf" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="LvglWatch" RUN_TARGET_NAME="LvglWatch.elf">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -121,7 +116,8 @@
       <workItem from="1675956160668" duration="32000" />
       <workItem from="1675987123204" duration="319000" />
       <workItem from="1676040920488" duration="29197000" />
-      <workItem from="1676162730627" duration="18138000" />
+      <workItem from="1676162730627" duration="18713000" />
+      <workItem from="1676213524504" duration="19000" />
     </task>
     <servers />
   </component>
